@@ -78,13 +78,13 @@
     /* ---------- SIDE PANEL ---------- */
     #panel {
       position: fixed; z-index: 1200; top: 14px; left: 14px; bottom: 14px; width: 330px;
-      display: flex; flex-direction: column; padding: 16px;
+      display: flex; flex-direction: column; padding: 16px; overflow: hidden;
       animation: slideIn .6s ease both; transition: transform .35s ease, opacity .35s ease;
     }
     #panel.hidden { transform: translateX(-120%); opacity: 0; pointer-events: none; }
     @keyframes slideIn { from { transform: translateX(-60px); opacity: 0; } to { transform: none; opacity: 1; } }
 
-    .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+    .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; flex: none; }
     .logo {
       width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; font-size: 22px;
       background: linear-gradient(135deg, var(--accent), var(--accent2)); box-shadow: var(--glow);
@@ -93,13 +93,13 @@
     .brand p { margin: 0; font-size: 11px; color: var(--muted); }
 
     #search {
-      width: 100%; padding: 11px 14px; border-radius: 12px; border: 1px solid var(--border);
+      flex: none; width: 100%; padding: 11px 14px; border-radius: 12px; border: 1px solid var(--border);
       background: var(--card); color: var(--text); font: 500 14px 'Poppins', sans-serif; outline: none;
     }
     #search::placeholder { color: var(--muted); }
     #search:focus { border-color: var(--accent); box-shadow: var(--glow); }
 
-    #chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0; }
+    #chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0; flex: none; }
     .chip {
       border: 1px solid var(--border); background: var(--card); color: var(--text);
       padding: 4px 10px; border-radius: 999px; font: 500 11.5px 'Poppins', sans-serif; cursor: pointer; transition: .2s;
@@ -107,7 +107,7 @@
     .chip:hover { border-color: var(--accent); }
     .chip.active { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; border-color: transparent; }
 
-    #list { flex: 1; overflow-y: auto; padding-right: 4px; }
+    #list { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding-right: 4px; }
     #list::-webkit-scrollbar { width: 6px; }
     #list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 6px; }
 
@@ -124,7 +124,7 @@
     .card .name { font-weight: 600; font-size: 13.5px; line-height: 1.25; }
     .card .type { font-size: 11px; color: var(--muted); }
 
-    .panel-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 12px; color: var(--muted); }
+    .panel-foot { flex: none; display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 10px; font-size: 12px; color: var(--muted); }
     .btn {
       border: 1px solid var(--border); background: var(--card); color: var(--text);
       padding: 7px 12px; border-radius: 10px; font: 500 12px 'Poppins', sans-serif; cursor: pointer; transition: .2s;
@@ -163,13 +163,25 @@
 
     /* ---------- MARKERS ---------- */
     .pin {
-      width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font-size: 18px;
-      background: var(--solid); border: 2.5px solid var(--c); position: relative;
+      --pin: 36px;
+      position: absolute; left: 50%; top: 50%;
+      width: var(--pin); height: var(--pin);
+      margin: calc(var(--pin) / -2) 0 0 calc(var(--pin) / -2);
+      border-radius: 50%; display: grid; place-items: center; font-size: calc(var(--pin) * 0.5);
+      background: var(--solid); border: 2.5px solid var(--c);
       box-shadow: 0 0 14px var(--c), 0 4px 10px rgba(0,0,0,.4);
-      animation: drop .5s ease both; transition: transform .2s;
+      animation: drop .5s ease backwards;
+      transition: width .2s, height .2s, margin .2s, font-size .2s, transform .2s;
     }
     .pin:hover { transform: scale(1.2); }
-    .pin.active { transform: scale(1.25); }
+    .pin.active { --pin: 36px; transform: scale(1.25); }
+    /* smaller pins when zoomed out, so they do not overlap */
+    .zoom-18 .pin { --pin: 28px; }
+    .zoom-17 .pin { --pin: 20px; border-width: 2px; box-shadow: 0 0 8px var(--c); }
+    .zoom-far .pin { --pin: 13px; border-width: 2px; box-shadow: 0 0 6px var(--c); }
+    .zoom-far .pin span { display: none; }
+    .zoom-far .pin.active span { display: inline; }
+    .zoom-17 .pin.active, .zoom-18 .pin.active, .zoom-far .pin.active { --pin: 36px; border-width: 2.5px; box-shadow: 0 0 14px var(--c), 0 4px 10px rgba(0,0,0,.4); }
     .pin.active::after {
       content: ""; position: absolute; inset: -6px; border-radius: 50%; border: 2px solid var(--c);
       animation: pulse 1.4s ease-out infinite;
@@ -215,7 +227,7 @@
     .leaflet-control-attribution a { color: var(--accent) !important; }
 
     /* ---------- DIRECTIONS BOX ---------- */
-    #dirbox { display: none; margin: 12px 0 0; padding: 12px; border-radius: 14px; background: var(--card); border: 1px solid var(--border); }
+    #dirbox { flex: none; display: none; margin: 12px 0 0; padding: 12px; border-radius: 14px; background: var(--card); border: 1px solid var(--border); }
     #dirbox.show { display: block; }
     .dir-head { display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 13.5px; margin-bottom: 10px; }
     .dir-x { border: none; background: transparent; color: var(--muted); font-size: 15px; cursor: pointer; }
@@ -241,7 +253,17 @@
 
     /* ---------- MOBILE ---------- */
     @media (max-width: 700px) {
-      #panel { top: auto; left: 10px; right: 10px; bottom: 10px; width: auto; height: 46vh; }
+      #panel {
+        top: auto; left: 10px; right: 10px; width: auto; padding: 12px;
+        bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+        height: 46vh; height: 46dvh;
+      }
+      /* when Directions is open: hide the long list so the buttons never get cut off */
+      #panel.dir-open { height: auto; max-height: 72vh; max-height: 72dvh; overflow-y: auto; }
+      #panel.dir-open #list, #panel.dir-open .brand { display: none; }
+      #chips { flex-wrap: nowrap; overflow-x: auto; margin: 8px 0; padding-bottom: 4px; }
+      .chip { flex: none; white-space: nowrap; }
+      .brand { margin-bottom: 10px; }
       #controls { top: 10px; right: 10px; padding: 6px 10px; }
       #toggle { display: inline-block; }
       #coordbox { top: 62px; right: 10px; width: 240px; }
@@ -391,6 +413,7 @@
       selectedId = id;
       Object.values(markers).forEach(m => { const el = m.getElement(); if (el) el.firstChild.classList.remove('active'); });
       if (id && markers[id] && markers[id].getElement()) markers[id].getElement().firstChild.classList.add('active');
+      Object.entries(markers).forEach(([k, m]) => m.setZIndexOffset(Number(k) === id ? 1000 : 0));
       document.querySelectorAll('.card').forEach(c => c.classList.toggle('active', Number(c.dataset.id) === id));
     }
 
@@ -404,7 +427,13 @@
     });
 
     // show name labels only when zoomed in
-    function updateLabels() { map.getContainer().classList.toggle('labels', map.getZoom() >= 19); }
+    function updateLabels() {
+      const z = map.getZoom(), c = map.getContainer();
+      c.classList.toggle('labels', z >= 19);
+      c.classList.toggle('zoom-18', z === 18);
+      c.classList.toggle('zoom-17', z === 17);
+      c.classList.toggle('zoom-far', z <= 16);
+    }
     map.on('zoomend', updateLabels);
 
     function fitAll() {
@@ -716,9 +745,11 @@
     function openDirBox() {
       dirBox.classList.add('show');
       document.getElementById('panel').classList.remove('hidden');
+      document.getElementById('panel').classList.add('dir-open');
     }
     function closeDirBox() {
       dirBox.classList.remove('show');
+      document.getElementById('panel').classList.remove('dir-open');
       lastRoute = null;
       routeLayer.clearLayers();
     }
