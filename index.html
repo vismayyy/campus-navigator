@@ -24,6 +24,9 @@
     window.L || document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"><\/script>');
   </script>
 
+  <!-- QR code library (used by the Share button) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
   <style>
     /* ---------- THEMES ---------- */
     body[data-theme="neon"] {
@@ -124,7 +127,10 @@
     .card .name { font-weight: 600; font-size: 13.5px; line-height: 1.25; }
     .card .type { font-size: 11px; color: var(--muted); }
 
-    .panel-foot { flex: none; display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 10px; font-size: 12px; color: var(--muted); }
+    .panel-foot { flex: none; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; margin-top: 10px; font-size: 12px; color: var(--muted); }
+    .panel-foot > span:last-child { display: flex; gap: 6px; }
+    .btn { white-space: nowrap; }
+    .sh-txt { display: none; }
     .btn {
       border: 1px solid var(--border); background: var(--card); color: var(--text);
       padding: 7px 12px; border-radius: 10px; font: 500 12px 'Poppins', sans-serif; cursor: pointer; transition: .2s;
@@ -182,6 +188,7 @@
     .zoom-far .pin span { display: none; }
     .zoom-far .pin.active span { display: inline; }
     .zoom-17 .pin.active, .zoom-18 .pin.active, .zoom-far .pin.active { --pin: 36px; border-width: 2.5px; box-shadow: 0 0 14px var(--c), 0 4px 10px rgba(0,0,0,.4); }
+    .pin.dc-hide { display: none; }   /* hidden when too close to a more important pin */
     .pin.active::after {
       content: ""; position: absolute; inset: -6px; border-radius: 50%; border: 2px solid var(--c);
       animation: pulse 1.4s ease-out infinite;
@@ -215,7 +222,8 @@
       display: inline-block; margin-top: 4px; padding: 2px 9px; border-radius: 999px; font-size: 10.5px; font-weight: 600;
       color: #fff; background: var(--c);
     }
-    .pop-info { margin: 10px 0; font-size: 12px; color: var(--muted); }
+    .pop-info { margin: 10px 0; font-size: 12px; color: var(--muted); line-height: 1.45; }
+    .pop-time { margin: -4px 0 10px; font-size: 12px; font-weight: 600; color: var(--accent); }
     .dir {
       width: 100%; padding: 8px; border: none; border-radius: 10px; font: 600 12px 'Poppins', sans-serif; color: #fff;
       background: linear-gradient(135deg, var(--accent), var(--accent2)); cursor: pointer; transition: .2s;
@@ -227,7 +235,7 @@
     .leaflet-control-attribution a { color: var(--accent) !important; }
 
     /* ---------- DIRECTIONS BOX ---------- */
-    #dirbox { flex: none; display: none; margin: 12px 0 0; padding: 12px; border-radius: 14px; background: var(--card); border: 1px solid var(--border); }
+    #dirbox { flex: 0 1 auto; min-height: 0; overflow-y: auto; display: none; margin: 12px 0 0; padding: 12px; border-radius: 14px; background: var(--card); border: 1px solid var(--border); }
     #dirbox.show { display: block; }
     .dir-head { display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 13.5px; margin-bottom: 10px; }
     .dir-x { border: none; background: transparent; color: var(--muted); font-size: 15px; cursor: pointer; }
@@ -251,22 +259,59 @@
     .dir-stats { display: flex; gap: 16px; margin-top: 6px; font-weight: 600; font-size: 14px; }
     .dir-warn { margin: 8px 0 0; font-size: 11.5px; color: #fbbf24; line-height: 1.4; }
 
+    /* ---------- NEAREST TO ME ---------- */
+    #nearRow { flex: none; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 10px 0 0; }
+    .near-lbl { flex: none; font: 600 11px 'Poppins', sans-serif; color: var(--muted); white-space: nowrap; }
+    #nearRow .chip { white-space: nowrap; }
+
+    /* ---------- SHARE / QR ---------- */
+    #shareModal {
+      position: fixed; inset: 0; z-index: 3000; display: none; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.55); padding: 16px;
+    }
+    #shareModal.show { display: flex; }
+    #shareCard { width: min(340px, 100%); padding: 18px; text-align: center; background: var(--solid); max-height: 92vh; overflow-y: auto; }
+    #shareCard h3 { margin: 0 0 4px; font-size: 16px; }
+    #shareCard p { margin: 0 0 12px; font-size: 12px; color: var(--muted); }
+    #qrBox { display: inline-block; background: #fff; padding: 12px; border-radius: 14px; line-height: 0; min-width: 64px; min-height: 64px; }
+    #qrBox img, #qrBox canvas { max-width: 100%; height: auto; }
+    #shareUrl {
+      margin: 12px 0 10px; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--border); background: var(--card);
+      font-size: 11.5px; word-break: break-all; user-select: all;
+    }
+    #shareCard .row { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+
     /* ---------- MOBILE ---------- */
     @media (max-width: 700px) {
       #panel {
         top: auto; left: 10px; right: 10px; width: auto; padding: 12px;
         bottom: calc(10px + env(safe-area-inset-bottom, 0px));
-        height: 46vh; height: 46dvh;
+        height: 50vh; height: 50dvh;
       }
-      /* when Directions is open: hide the long list so the buttons never get cut off */
-      #panel.dir-open { height: auto; max-height: 72vh; max-height: 72dvh; overflow-y: auto; }
-      #panel.dir-open #list, #panel.dir-open .brand { display: none; }
+      /* when Directions is open: hide the long list so the bottom buttons never get cut off.
+         The directions box scrolls by itself if it is too tall; the buttons stay fixed at the bottom. */
+      #panel.dir-open { height: auto; max-height: 70vh; max-height: 70dvh; }
+      #panel.dir-open #list, #panel.dir-open .brand, #panel.dir-open #search,
+      #panel.dir-open #chips, #panel.dir-open #nearRow { display: none; }
+      #panel.dir-open #dirbox { margin-top: 0; }
+      .brand { margin-bottom: 8px; gap: 10px; }
+      .brand .logo { width: 34px; height: 34px; font-size: 17px; border-radius: 11px; }
+      .brand h1 { font-size: 15px; }
+      .brand p { display: none; }
       #chips { flex-wrap: nowrap; overflow-x: auto; margin: 8px 0; padding-bottom: 4px; }
       .chip { flex: none; white-space: nowrap; }
-      .brand { margin-bottom: 10px; }
+      #nearRow { flex-wrap: nowrap; overflow-x: auto; margin-top: 8px; padding-bottom: 2px; }
+      #nearRow .chip { flex: none; }
+      /* bottom buttons: always visible, share the full width, easy to tap */
+      .panel-foot { margin-top: 8px; }
+      #count { display: none; }
+      .panel-foot > span:last-child { width: 100%; }
+      .panel-foot .btn { flex: 1; padding: 10px 8px; }
+      .sh-txt { display: inline; }
       #controls { top: 10px; right: 10px; padding: 6px 10px; }
       #toggle { display: inline-block; }
       #coordbox { top: 62px; right: 10px; width: 240px; }
+      .leaflet-control-zoom { display: none; }   /* phones use pinch-to-zoom; the buttons were hidden behind the panel */
     }
   </style>
 </head>
@@ -284,6 +329,7 @@
       </div>
     </div>
     <input id="search" type="text" placeholder="🔍  Search places...">
+    <div id="nearRow"><span class="near-lbl">📍 Nearest to me:</span></div>
     <div id="dirbox">
       <div class="dir-head"><span>🧭 Directions</span><button class="dir-x" id="dirClose" title="Close">✕</button></div>
       <div class="dir-row"><span class="dir-dot">A</span><select id="dirFrom"></select><button class="dir-swap" id="dirLocate" title="Use my location">📍</button></div>
@@ -294,7 +340,7 @@
     <div id="list"></div>
     <div class="panel-foot">
       <span id="count"></span>
-      <span><button class="btn" id="dirOpenBtn">🧭 Directions</button> <button class="btn" id="fitBtn">Show all</button></span>
+      <span><button class="btn" id="dirOpenBtn">🧭 Directions</button><button class="btn" id="fitBtn">Show all</button><button class="btn" id="shareBtn" title="Share this app">🔗<span class="sh-txt"> Share</span></button></span>
     </div>
   </aside>
 
@@ -321,6 +367,22 @@
     </div>
   </div>
 
+  <!-- SHARE / QR POPUP -->
+  <div id="shareModal">
+    <div id="shareCard" class="glass">
+      <h3>🔗 Share Campus Navigator</h3>
+      <p>Scan this QR code with a phone camera to open the app.</p>
+      <div id="qrBox"></div>
+      <div id="shareUrl"></div>
+      <div class="row">
+        <button class="btn" id="copyLinkBtn">Copy link</button>
+        <button class="btn" id="nativeShareBtn" style="display:none">Share...</button>
+        <button class="btn" id="dlQrBtn">Download QR</button>
+        <button class="btn" id="shareClose">Close</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     // ================= DATA =================
     const TYPE = {
@@ -337,6 +399,15 @@
       "Temple":         { emoji: "🛕", color: "#fbbf24" }
     };
 
+    // Order of importance when pins are too close together (earlier = stays visible when zoomed out)
+    const PRIORITY = ["Entrance", "Academic", "Library", "Food", "Hostel", "Administration", "Sports", "Temple", "Placement", "Lab", "Utility"];
+
+    // The link people open (used for the QR code). Change this if your link changes.
+    const PUBLIC_URL = "https://vismayyy.github.io/campus-navigator/";
+
+    // Each place can have:  info: "short description"   and (optional)   timings: "9:00 AM - 5:00 PM"
+    // Timings show on the info card only when you add them. Example:
+    //   { id: 10, name: "APS Library", ..., info: "Books and reading hall", timings: "9:00 AM - 5:00 PM" },
     const facilities = [
       { id: 1,  name: "Main Gate",                     type: "Entrance",       lat: 12.78283,           lng: 77.49911,          info: "Campus entrance" },
       { id: 2,  name: "Parking",                       type: "Utility",        lat: 12.78347,           lng: 77.49807,          info: "Vehicle parking area" },
@@ -406,6 +477,7 @@
           <div><div class="pop-name">${f.name}</div><span class="badge" style="--c:${t.color}">${f.type}</span></div>
         </div>
         <p class="pop-info">${f.info}</p>
+        ${f.timings ? `<p class="pop-time">🕒 ${f.timings}</p>` : ''}
         <button class="dir" onclick="startDirections(${f.id})">🧭 Directions to here</button>`;
     }
 
@@ -415,11 +487,31 @@
       if (id && markers[id] && markers[id].getElement()) markers[id].getElement().firstChild.classList.add('active');
       Object.entries(markers).forEach(([k, m]) => m.setZIndexOffset(Number(k) === id ? 1000 : 0));
       document.querySelectorAll('.card').forEach(c => c.classList.toggle('active', Number(c.dataset.id) === id));
+      declutter();
+    }
+
+    // When zoomed out, hide pins that would sit on top of a more important pin (the selected pin is always shown)
+    function declutter() {
+      const z = map.getZoom();
+      const minPx = z >= 19 ? 0 : z === 18 ? 30 : z === 17 ? 26 : 22;
+      const shown = facilities.filter(f => map.hasLayer(markers[f.id])).sort((a, b) => {
+        if (a.id === selectedId) return -1;
+        if (b.id === selectedId) return 1;
+        return PRIORITY.indexOf(a.type) - PRIORITY.indexOf(b.type);
+      });
+      const kept = [];
+      shown.forEach(f => {
+        const p = map.latLngToContainerPoint([f.lat, f.lng]);
+        const clash = minPx > 0 && kept.some(q => Math.hypot(p.x - q.x, p.y - q.y) < minPx);
+        if (!clash) kept.push(p);
+        const el = markers[f.id].getElement();
+        if (el && el.firstChild) el.firstChild.classList.toggle('dc-hide', clash);
+      });
     }
 
     facilities.forEach(f => {
       const m = L.marker([f.lat, f.lng], { icon: pinIcon(f) }).addTo(map);
-      m.bindPopup(popupHTML(f), { className: 'glass-pop', closeButton: false });
+      m.bindPopup(popupHTML(f), { className: 'glass-pop', closeButton: false, minWidth: 200, maxWidth: 260 });
       m.bindTooltip(f.name, { permanent: true, direction: 'bottom', offset: [0, 18], className: 'lbl', opacity: 1 });
       m.on('click', () => setActive(f.id));
       m.on('popupclose', () => { if (selectedId === f.id) setActive(null); });
@@ -433,6 +525,7 @@
       c.classList.toggle('zoom-18', z === 18);
       c.classList.toggle('zoom-17', z === 17);
       c.classList.toggle('zoom-far', z <= 16);
+      declutter();
     }
     map.on('zoomend', updateLabels);
 
@@ -483,6 +576,7 @@
       });
 
       document.getElementById('count').textContent = items.length + ' places';
+      declutter();
     }
 
     function buildChips() {
@@ -765,7 +859,7 @@
     const meLayer = L.layerGroup().addTo(map);
     let myGap = 0, meOptionAdded = false;
 
-    function locateMe() {
+    function locateMe(onDone) {
       openDirBox();
       if (!navigator.geolocation) {
         dirResult.innerHTML = '<p class="dir-warn">⚠ Your browser does not support location.</p>';
@@ -786,6 +880,7 @@
           meOptionAdded = true;
         }
         dirFrom.value = 'me';
+        if (typeof onDone === 'function') { onDone(); return; }
         if (myGap > OFF_CAMPUS) { updateDirections(); return; }
         if (!dirTo.value) {
           dirResult.innerHTML = '<p class="dir-hint">📍 Got your location. Now choose a destination (B).</p>';
@@ -800,7 +895,7 @@
         dirResult.innerHTML = `<p class="dir-warn">⚠ ${msg}</p><p class="dir-hint">Note: location only works on https:// links or on localhost, not when the file is opened directly.</p>`;
       }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 });
     }
-    document.getElementById('dirLocate').onclick = locateMe;
+    document.getElementById('dirLocate').onclick = () => locateMe();
 
     dirFrom.addEventListener('change', updateDirections);
     dirTo.addEventListener('change', updateDirections);
@@ -813,9 +908,105 @@
       if (dirBox.classList.contains('show')) closeDirBox(); else { openDirBox(); updateDirections(); }
     };
 
+    // ================= NEAREST TO ME =================
+    // To add a new button (for example restrooms), add a place with a new type in TYPE and facilities, then add a line here.
+    const NEAR_OPTIONS = [
+      { label: 'Canteen', emoji: '🍔', type: 'Food' },
+      { label: 'Hostel',  emoji: '🏠', type: 'Hostel' },
+      { label: 'Library', emoji: '📚', type: 'Library' },
+      { label: 'Parking', emoji: '🅿️', type: 'Utility' },
+      { label: 'Gate',    emoji: '🚪', type: 'Entrance' },
+      { label: 'Temple',  emoji: '🛕', type: 'Temple' }
+    ];
+
+    function nearestTo(opt) {
+      locateMe(() => {
+        openDirBox();
+        if (myGap > OFF_CAMPUS) {
+          dirResult.innerHTML = `<p class="dir-warn">⚠ You are about ${Math.round(myGap)} m from the campus paths, so I cannot find the nearest ${opt.label.toLowerCase()} by walking. Try again when you are on campus.</p>`;
+          return;
+        }
+        let best = null;
+        facilities.filter(f => f.type === opt.type).forEach(f => {
+          const r = shortestPath('me', f.id);
+          if (r && (!best || r.dist < best.r.dist)) best = { f, r };
+        });
+        if (!best) { dirResult.innerHTML = `<p class="dir-warn">⚠ No walking route found to a ${opt.label.toLowerCase()}.</p>`; return; }
+        dirFrom.value = 'me';
+        dirTo.value = String(best.f.id);
+        updateDirections();
+        dirResult.insertAdjacentHTML('afterbegin', `<p class="dir-hint">⭐ Nearest ${opt.label.toLowerCase()}: <b>${best.f.name}</b></p>`);
+      });
+    }
+
+    function buildNearRow() {
+      const row = document.getElementById('nearRow');
+      NEAR_OPTIONS.forEach(o => {
+        const b = document.createElement('button');
+        b.className = 'chip';
+        b.textContent = o.emoji + ' ' + o.label;
+        b.onclick = () => nearestTo(o);
+        row.appendChild(b);
+      });
+    }
+
+    // ================= SHARE / QR =================
+    const shareModal = document.getElementById('shareModal');
+    const qrBox = document.getElementById('qrBox');
+    let qrReady = false;
+
+    function openShare() {
+      shareModal.classList.add('show');
+      document.getElementById('shareUrl').textContent = PUBLIC_URL;
+      document.getElementById('nativeShareBtn').style.display = navigator.share ? '' : 'none';
+      if (qrReady) return;
+      qrBox.innerHTML = '';
+      try {
+        if (!window.QRCode) throw new Error('no QR library');
+        new QRCode(qrBox, { text: PUBLIC_URL, width: 220, height: 220, colorDark: '#000000', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M });
+        document.getElementById('dlQrBtn').style.display = '';
+      } catch (e) {
+        // backup: online QR image (cannot be downloaded from here)
+        qrBox.innerHTML = '<img width="220" height="220" alt="QR code" src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=0&data=' + encodeURIComponent(PUBLIC_URL) + '">';
+        document.getElementById('dlQrBtn').style.display = 'none';
+      }
+      qrReady = true;
+    }
+    function closeShare() { shareModal.classList.remove('show'); }
+
+    document.getElementById('shareBtn').onclick = openShare;
+    document.getElementById('shareClose').onclick = closeShare;
+    shareModal.addEventListener('click', e => { if (e.target === shareModal) closeShare(); });
+
+    document.getElementById('copyLinkBtn').onclick = e => {
+      const btn = e.currentTarget;
+      const done = () => { btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = 'Copy link', 1400); };
+      const fallback = () => {
+        const t = document.createElement('textarea'); t.value = PUBLIC_URL; document.body.appendChild(t);
+        t.select(); try { document.execCommand('copy'); } catch (err) {} t.remove(); done();
+      };
+      if (navigator.clipboard) navigator.clipboard.writeText(PUBLIC_URL).then(done).catch(fallback); else fallback();
+    };
+    document.getElementById('nativeShareBtn').onclick = () => {
+      if (navigator.share) navigator.share({ title: 'Campus Navigator', text: 'Find your way around APS College of Engineering', url: PUBLIC_URL }).catch(() => {});
+    };
+    document.getElementById('dlQrBtn').onclick = () => {
+      const src = qrBox.querySelector('canvas');
+      if (!src) return;
+      const m = 24, c = document.createElement('canvas');   // add a white border so phones scan it easily
+      c.width = src.width + m * 2; c.height = src.height + m * 2;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, c.width, c.height);
+      ctx.drawImage(src, m, m);
+      const a = document.createElement('a');
+      a.href = c.toDataURL('image/png'); a.download = 'campus-navigator-qr.png';
+      document.body.appendChild(a); a.click(); a.remove();
+    };
+
     // ================= START =================
     document.querySelectorAll('.swatch').forEach(s => s.onclick = () => setTheme(s.dataset.t));
     buildChips();
+    buildNearRow();
     applyFilter();
     let saved = 'neon';
     try { saved = localStorage.getItem('campusTheme') || 'neon'; } catch (e) {}
