@@ -24,44 +24,50 @@
     window.L || document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"><\/script>');
   </script>
 
+
+  <!-- MapLibre GL: used only for the real-3D route preview (the normal map stays Leaflet) -->
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/4.7.1/maplibre-gl.css">
+  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+  <script>
+    window.maplibregl || document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/4.7.1/maplibre-gl.js"><\/script>');
+  </script>
+
   <!-- QR code library (used by the Share button) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
   <style>
     /* ---------- THEMES ---------- */
-    body[data-theme="neon"] {
+    body[data-theme="dark"] {
       --glass: rgba(10, 12, 30, 0.72); --solid: #0d1029; --card: rgba(255,255,255,0.06);
       --text: #e8ecff; --muted: #8b93c7; --accent: #00f0ff; --accent2: #ff2bd6;
-      --border: rgba(0, 240, 255, 0.25); --glow: 0 0 18px rgba(0, 240, 255, 0.35);
+      --border: rgba(0, 240, 255, 0.25); --glow: 0 0 18px rgba(0, 240, 255, 0.35); --fog: #0b0d1a;
     }
-    body[data-theme="aurora"] {
+    body[data-theme="light"] {
       --glass: rgba(255, 255, 255, 0.80); --solid: #ffffff; --card: rgba(99,102,241,0.08);
       --text: #1f2340; --muted: #6b7094; --accent: #6366f1; --accent2: #ec4899;
-      --border: rgba(99, 102, 241, 0.25); --glow: 0 6px 20px rgba(99, 102, 241, 0.25);
-    }
-    body[data-theme="satellite"] {
-      --glass: rgba(12, 22, 18, 0.66); --solid: #0f1a15; --card: rgba(255,255,255,0.08);
-      --text: #ffffff; --muted: #b6c4bb; --accent: #4ade80; --accent2: #facc15;
-      --border: rgba(74, 222, 128, 0.30); --glow: 0 0 18px rgba(74, 222, 128, 0.35);
-    }
-    body[data-theme="sunset"] {
-      --glass: rgba(36, 14, 26, 0.74); --solid: #240e1a; --card: rgba(255,255,255,0.07);
-      --text: #fff1e6; --muted: #d6a88f; --accent: #ff8a3d; --accent2: #ff4d6d;
-      --border: rgba(255, 138, 61, 0.30); --glow: 0 0 18px rgba(255, 138, 61, 0.35);
+      --border: rgba(99, 102, 241, 0.25); --glow: 0 6px 20px rgba(99, 102, 241, 0.25); --fog: #e8eaf6;
     }
 
     /* ---------- MAP TILE LOOKS (colour filters on the street map) ---------- */
-    .tiles-neon   { filter: hue-rotate(180deg) saturate(.9) brightness(.62) contrast(1.2); }
-    .tiles-sunset { filter: sepia(.8) saturate(1.8) hue-rotate(-15deg) brightness(.7) contrast(1.15); }
-    .tiles-aurora { filter: brightness(1.25) saturate(.55) contrast(.85); }
-    body[data-theme="neon"]   #map { background: #0b0d1a; }
-    body[data-theme="sunset"] #map { background: #1a0a12; }
-    body[data-theme="aurora"] #map { background: #e8eaf6; }
+    .tiles-dark   { filter: hue-rotate(180deg) saturate(.9) brightness(.62) contrast(1.2); }
+    .tiles-light  { filter: brightness(1.25) saturate(.55) contrast(.85); }
+    body[data-theme="dark"]  #map { background: #0b0d1a; }
+    body[data-theme="light"] #map { background: #e8eaf6; }
 
     /* ---------- BASE ---------- */
     * { box-sizing: border-box; }
     html, body { margin: 0; height: 100%; font-family: 'Poppins', system-ui, sans-serif; color: var(--text); }
-    #map { position: fixed; inset: 0; z-index: 0; background: #111; }
+    #mapWrap { position: fixed; inset: 0; z-index: 0; overflow: hidden; perspective: 1000px; background: var(--fog, #111); }
+    #map { position: absolute; inset: 0; z-index: 0; background: #111; transform-origin: 50% 50%; transition: transform .9s ease; }
+    /* 3D view: the map gets bigger than the screen (so no empty edges show), then tips back like a floor */
+    #mapWrap.big #map { inset: -50%; }
+    #mapWrap.tilt #map { transform: translateY(6vh) rotateX(50deg); }
+    #fog { position: absolute; inset: 0; z-index: 5; pointer-events: none; opacity: 0; transition: opacity .9s ease;
+           background: linear-gradient(to bottom, var(--fog) 0%, var(--fog) 10%, transparent 42%); }
+    #mapWrap.tilt #fog { opacity: 1; }
+    /* stand the pins and labels back up so they do not look squashed in 3D */
+    #mapWrap.tilt .pin, #mapWrap.tilt .lbl, #mapWrap.tilt .w-dot { scale: 1 1.55; }
     #map.tool-on, #map.tool-on .leaflet-interactive { cursor: crosshair; }
 
     #errbox {
@@ -142,15 +148,6 @@
       position: fixed; z-index: 1200; top: 14px; right: 14px; display: flex; gap: 10px; align-items: center;
       padding: 8px 12px; animation: slideIn .8s ease both;
     }
-    .swatch {
-      width: 26px; height: 26px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; transition: .2s;
-    }
-    .swatch:hover { transform: scale(1.15); }
-    .swatch.active { border-color: #fff; box-shadow: 0 0 0 2px var(--accent); }
-    .swatch[data-t="neon"]      { background: linear-gradient(135deg, #00f0ff, #ff2bd6); }
-    .swatch[data-t="aurora"]    { background: linear-gradient(135deg, #6366f1, #ec4899); }
-    .swatch[data-t="satellite"] { background: linear-gradient(135deg, #4ade80, #166534); }
-    .swatch[data-t="sunset"]    { background: linear-gradient(135deg, #ff8a3d, #ff4d6d); }
     .divider { width: 1px; height: 22px; background: var(--border); }
     #toggle { display: none; }
 
@@ -177,7 +174,7 @@
       background: var(--solid); border: 2.5px solid var(--c);
       box-shadow: 0 0 14px var(--c), 0 4px 10px rgba(0,0,0,.4);
       animation: drop .5s ease backwards;
-      transition: width .2s, height .2s, margin .2s, font-size .2s, transform .2s;
+      transition: width .2s, height .2s, margin .2s, font-size .2s, transform .2s, scale .9s ease;
     }
     .pin:hover { transform: scale(1.2); }
     .pin.active { --pin: 36px; transform: scale(1.25); }
@@ -197,7 +194,7 @@
     @keyframes pulse { from { transform: scale(.9); opacity: .9; } to { transform: scale(1.7); opacity: 0; } }
 
     .lbl {
-      opacity: 0 !important; transition: opacity .25s; background: var(--solid); color: var(--text);
+      opacity: 0 !important; transition: opacity .25s, scale .9s ease; background: var(--solid); color: var(--text);
       border: 1px solid var(--border); border-radius: 8px; font: 600 11px 'Poppins', sans-serif; padding: 2px 8px; box-shadow: none;
     }
     .labels .lbl { opacity: 1 !important; }
@@ -229,13 +226,16 @@
       background: linear-gradient(135deg, var(--accent), var(--accent2)); cursor: pointer; transition: .2s;
     }
     .dir:hover { box-shadow: var(--glow); transform: translateY(-1px); }
+    .pop-btns { display: flex; gap: 6px; }
+    .pop-btns .dir { flex: 1; width: auto; }
+    .pop-btns .dir.alt { flex: none; padding: 8px 10px; background: var(--card); color: var(--text); border: 1px solid var(--border); }
 
     .leaflet-control-zoom a { background: var(--solid) !important; color: var(--text) !important; border-color: var(--border) !important; }
     .leaflet-control-attribution { background: var(--glass) !important; color: var(--muted) !important; }
     .leaflet-control-attribution a { color: var(--accent) !important; }
 
     /* ---------- DIRECTIONS BOX ---------- */
-    #dirbox { flex: 0 1 auto; min-height: 0; overflow-y: auto; display: none; margin: 12px 0 0; padding: 12px; border-radius: 14px; background: var(--card); border: 1px solid var(--border); }
+    #dirbox { flex: none; max-height: 60%; overflow-y: auto; display: none; margin: 12px 0 0; padding: 12px; border-radius: 14px; background: var(--card); border: 1px solid var(--border); }
     #dirbox.show { display: block; }
     .dir-head { display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 13.5px; margin-bottom: 10px; }
     .dir-x { border: none; background: transparent; color: var(--muted); font-size: 15px; cursor: pointer; }
@@ -258,6 +258,77 @@
     .dir-hint { margin: 4px 0 0; font-size: 12px; color: var(--muted); }
     .dir-stats { display: flex; gap: 16px; margin-top: 6px; font-weight: 600; font-size: 14px; }
     .dir-warn { margin: 8px 0 0; font-size: 11.5px; color: #fbbf24; line-height: 1.4; }
+
+    /* ---------- STEPS + LIVE TRACKING ---------- */
+    .btn.primary { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; border-color: transparent; }
+    .dir-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .dir-actions .btn { flex: 1 1 auto; padding: 8px 8px; }
+    .live-card {
+      display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px;
+      background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 28%, transparent), color-mix(in srgb, var(--accent2) 22%, transparent));
+      border: 1px solid var(--accent);
+    }
+    .live-card .big { flex: none; font-size: 28px; line-height: 1; }
+    .live-card .t1 { font-weight: 700; font-size: 13.5px; line-height: 1.3; }
+    .live-card .t2 { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+    .steps-sum { cursor: pointer; font-weight: 600; font-size: 12.5px; margin-top: 12px; }
+    .steps { list-style: none; margin: 6px 0 0; padding: 0; }
+    .step { display: flex; align-items: flex-start; gap: 8px; padding: 7px 8px; border-radius: 10px; cursor: pointer; border: 1px solid transparent; }
+    .step:hover { border-color: var(--border); }
+    .step.now { background: var(--card); border-color: var(--accent); }
+    .step .si { flex: none; width: 26px; text-align: center; font-size: 17px; line-height: 1.3; }
+    .step .st { font-size: 12.5px; font-weight: 500; line-height: 1.35; }
+    .step .sd { font-size: 11px; color: var(--muted); }
+
+
+    .gpin { transition: none; }
+    /* ---------- REAL 3D SCENE (MapLibre) ---------- */
+    #map3d { position: fixed; inset: 0; z-index: 900; display: none; background: var(--fog, #111); }
+    #map3d.show { display: block; animation: glin .6s ease; }
+    #gl3d { position: absolute; inset: 0; }
+    #glFog { position: absolute; inset: 0; z-index: 2; pointer-events: none;
+             background: linear-gradient(to bottom, var(--fog) 0%, transparent 22%); }
+    @keyframes glin { from { opacity: 0; } to { opacity: 1; } }
+    #map3d .maplibregl-canvas { outline: none; }
+    #map3d .maplibregl-ctrl-bottom-right, #map3d .maplibregl-ctrl-bottom-left { bottom: calc(62px + env(safe-area-inset-bottom, 0px)); }
+    .gpin {
+      --c: #fff; position: relative; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-size: 13px;
+      background: var(--solid); border: 2px solid var(--c); box-shadow: 0 0 10px var(--c), 0 3px 8px rgba(0,0,0,.4); pointer-events: none;
+    }
+    .gpin.big { width: 34px; height: 34px; font-size: 17px; border-width: 2.5px; z-index: 2; }
+    .gpin b {
+      position: absolute; top: 100%; left: 50%; transform: translateX(-50%); margin-top: 5px; white-space: nowrap;
+      font: 600 11px 'Poppins', sans-serif; color: var(--text); background: var(--solid);
+      border: 1px solid var(--border); border-radius: 8px; padding: 2px 8px;
+    }
+
+    /* ---------- 3D FLY-THROUGH ---------- */
+    #flyHud {
+      position: fixed; z-index: 1300; left: 50%; transform: translateX(-50%);
+      bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+      display: none; align-items: center; gap: 10px; padding: 8px 12px; width: min(440px, calc(100vw - 24px));
+    }
+    #flyHud.show { display: flex; }
+    #flyHud .btn { padding: 6px 10px; }
+    .fly-bar { flex: 1; height: 6px; border-radius: 6px; background: var(--card); border: 1px solid var(--border); overflow: hidden; }
+    #flyFill { height: 100%; width: 0; background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+    #flyTxt { font: 600 11.5px 'Poppins', sans-serif; color: var(--text); white-space: nowrap; }
+    .walker { position: relative; width: 0; height: 0; }
+    .walker .w-ring {
+      position: absolute; left: -26px; top: -26px; width: 52px; height: 52px; border-radius: 50%;
+      border: 2px solid var(--accent2); animation: wring 1.5s ease-out infinite;
+    }
+    .walker .w-shadow {
+      position: absolute; left: -12px; top: -12px; width: 24px; height: 24px; border-radius: 50%;
+      background: rgba(0,0,0,.5); filter: blur(3px);
+    }
+    .walker .w-dot {
+      position: absolute; left: -13px; top: -40px; width: 26px; height: 26px; border-radius: 50%; transform-origin: 50% 100%;
+      background: radial-gradient(circle at 35% 30%, #ffffff 0%, var(--accent2) 55%, var(--accent) 100%);
+      box-shadow: 0 0 18px var(--accent2), 0 6px 10px rgba(0,0,0,.35); animation: wbob 0.9s ease-in-out infinite alternate;
+    }
+    @keyframes wring { from { transform: scale(.35); opacity: .95; } to { transform: scale(1.5); opacity: 0; } }
+    @keyframes wbob { from { transform: translateY(0); } to { transform: translateY(-7px); } }
 
     /* ---------- NEAREST TO ME ---------- */
     #nearRow { flex: none; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 10px 0 0; }
@@ -293,7 +364,7 @@
       #panel.dir-open { height: auto; max-height: 70vh; max-height: 70dvh; }
       #panel.dir-open #list, #panel.dir-open .brand, #panel.dir-open #search,
       #panel.dir-open #chips, #panel.dir-open #nearRow { display: none; }
-      #panel.dir-open #dirbox { margin-top: 0; }
+      #panel.dir-open #dirbox { margin-top: 0; flex: 0 1 auto; min-height: 0; max-height: none; }
       .brand { margin-bottom: 8px; gap: 10px; }
       .brand .logo { width: 34px; height: 34px; font-size: 17px; border-radius: 11px; }
       .brand h1 { font-size: 15px; }
@@ -315,9 +386,12 @@
     }
   </style>
 </head>
-<body data-theme="neon">
+<body data-theme="dark">
 
-  <div id="map"></div>
+  <div id="mapWrap">
+    <div id="map"></div>
+    <div id="fog"></div>
+  </div>
 
   <!-- SIDE PANEL -->
   <aside id="panel" class="glass">
@@ -347,10 +421,7 @@
   <!-- TOP RIGHT CONTROLS -->
   <div id="controls" class="glass">
     <button class="btn" id="toggle">☰</button>
-    <div class="swatch" data-t="neon" title="Neon Night"></div>
-    <div class="swatch" data-t="aurora" title="Aurora Light"></div>
-    <div class="swatch" data-t="satellite" title="Satellite"></div>
-    <div class="swatch" data-t="sunset" title="Sunset"></div>
+    <button class="btn" id="themeBtn" title="Switch between dark and bright"></button>
     <div class="divider"></div>
     <button class="btn" id="toolBtn">📍 Path tool: OFF</button>
   </div>
@@ -367,11 +438,22 @@
     </div>
   </div>
 
+  <!-- REAL 3D SCENE -->
+  <div id="map3d"><div id="gl3d"></div><div id="glFog"></div></div>
+
+  <!-- 3D FLY-THROUGH CONTROLS -->
+  <div id="flyHud" class="glass">
+    <button class="btn" id="flyPause" title="Pause / play">⏸</button>
+    <div class="fly-bar"><div id="flyFill"></div></div>
+    <span id="flyTxt">🎬 3D preview</span>
+    <button class="btn" id="flyClose" title="Close the 3D preview">✕</button>
+  </div>
+
   <!-- SHARE / QR POPUP -->
   <div id="shareModal">
     <div id="shareCard" class="glass">
-      <h3>🔗 Share Campus Navigator</h3>
-      <p>Scan this QR code with a phone camera to open the app.</p>
+      <h3 id="shareTitle">🔗 Share Campus Navigator</h3>
+      <p id="shareDesc">Scan this QR code with a phone camera to open the app.</p>
       <div id="qrBox"></div>
       <div id="shareUrl"></div>
       <div class="row">
@@ -396,11 +478,12 @@
       "Food":           { emoji: "🍔", color: "#fb923c" },
       "Hostel":         { emoji: "🏠", color: "#f472b6" },
       "Sports":         { emoji: "⚽", color: "#4ade80" },
-      "Temple":         { emoji: "🛕", color: "#fbbf24" }
+      "Temple":         { emoji: "🛕", color: "#fbbf24" },
+      "Auditorium":     { emoji: "🎭", color: "#2dd4bf" }
     };
 
     // Order of importance when pins are too close together (earlier = stays visible when zoomed out)
-    const PRIORITY = ["Entrance", "Academic", "Library", "Food", "Hostel", "Administration", "Sports", "Temple", "Placement", "Lab", "Utility"];
+    const PRIORITY = ["Entrance", "Academic", "Library", "Food", "Hostel", "Administration", "Sports", "Temple", "Auditorium", "Placement", "Lab", "Utility"];
 
     // The link people open (used for the QR code). Change this if your link changes.
     const PUBLIC_URL = "https://vismayyy.github.io/campus-navigator/";
@@ -425,8 +508,29 @@
       { id: 14, name: "Polytechnic Playground",        type: "Sports",         lat: 12.78707972413123,  lng: 77.49901800683597, info: "Playground and sports area" },
       { id: 15, name: "Shri Ananthapadmanabha Swamy Temple", type: "Temple",   lat: 12.783529186107438, lng: 77.4972574215545,  info: "Temple inside the campus" },
       { id: 16, name: "College of Engineering Sports",   type: "Sports",         lat: 12.782838384289903, lng: 77.49825265040775, info: "Sports area of the College of Engineering" },
-      { id: 17, name: "APS PU College",                 type: "Academic",       lat: 12.784799928917495, lng: 77.49645087200727, info: "APS Pre-University College" },
-      { id: 18, name: "APS Polytechnic",                type: "Academic",       lat: 12.78767650902096,  lng: 77.4983474808576,  info: "APS Polytechnic college" }
+      { id: 17, name: "APS PU College",                 type: "Academic",       lat: 12.7840262,           lng: 77.4965326, info: "APS Pre-University College" },
+      { id: 18, name: "APS Polytechnic",                type: "Academic",       lat: 12.78767650902096,  lng: 77.4983474808576,  info: "APS Polytechnic college" },
+      { id: 19, name: "Open Auditorium",               type: "Auditorium",     lat: 12.7830698,         lng: 77.4972636,        info: "Open-air auditorium for events and gatherings" },
+      { id: 20, name: "APS Cricket Stadium",            type: "Sports",         lat: 12.7861194,         lng: 77.4981718,        info: "Cricket ground" }
+    ];
+
+    // Building outlines for the 3D preview (estimated around each place pin: [lat, lng] corners, floors = height).
+    // To fix one, change its pts or floors. Add "roof": "#ffcc00" to colour a roof.
+    const BUILDINGS = [
+      {"id": "b3", "name": "CS & Civil Engineering Block", "type": "Academic", "floors": 3, "pts": [[12.783717, 77.498826], [12.783756, 77.498665], [12.783373, 77.498566], [12.783334, 77.498727]]},
+      {"id": "b4", "name": "College of Engineering", "type": "Academic", "floors": 4, "pts": [[12.783593, 77.496666], [12.783697, 77.496698], [12.783777, 77.496426], [12.783673, 77.496394]]},
+      {"id": "b5", "name": "CSE/ISE Block (First Years)", "type": "Academic", "floors": 3, "pts": [[12.783535, 77.496434], [12.783611, 77.496458], [12.783662, 77.496283], [12.783586, 77.49626]]},
+      {"id": "b7", "name": "Administrative Block", "type": "Administration", "floors": 2, "pts": [[12.783007, 77.497682], [12.78305, 77.497542], [12.782793, 77.497458], [12.78275, 77.497598]]},
+      {"id": "b8", "name": "Placement and Training Center", "type": "Placement", "floors": 2, "pts": [[12.783862, 77.497016], [12.783891, 77.496891], [12.783698, 77.496844], [12.783669, 77.496969]]},
+      {"id": "b9", "name": "Foundry and Forging Lab", "type": "Lab", "floors": 1, "pts": [[12.783843, 77.498693], [12.783966, 77.498721], [12.784017, 77.498487], [12.783894, 77.498459]]},
+      {"id": "b10", "name": "APS Library", "type": "Library", "floors": 2, "pts": [[12.78272, 77.4971], [12.782823, 77.497141], [12.782898, 77.496942], [12.782794, 77.496901]]},
+      {"id": "b11", "name": "Canteen", "type": "Food", "floors": 1, "pts": [[12.782626, 77.497201], [12.782704, 77.497232], [12.782754, 77.497099], [12.782676, 77.497068]]},
+      {"id": "b12", "name": "Boys Hostel", "type": "Hostel", "floors": 4, "pts": [[12.788814, 77.497911], [12.78892, 77.497981], [12.789174, 77.49758], [12.789069, 77.49751]]},
+      {"id": "b13", "name": "Girls Hostel", "type": "Hostel", "floors": 4, "pts": [[12.782965, 77.496794], [12.783088, 77.496822], [12.783175, 77.496426], [12.783052, 77.496398]]},
+      {"id": "b15", "name": "Shri Ananthapadmanabha Swamy Temple", "type": "Temple", "floors": 1, "pts": [[12.78345, 77.497298], [12.783569, 77.497339], [12.783609, 77.497217], [12.78349, 77.497176]]},
+      {"id": "b17", "name": "APS PU College", "type": "Academic", "floors": 3, "pts": [[12.784179, 77.496654], [12.784219, 77.496512], [12.783873, 77.496411], [12.783834, 77.496553]]},
+      {"id": "b18", "name": "APS Polytechnic", "type": "Academic", "floors": 3, "pts": [[12.787525, 77.498548], [12.787678, 77.498601], [12.787828, 77.498147], [12.787675, 77.498094]]},
+      {"id": "b19", "name": "Open Auditorium", "type": "Auditorium", "floors": 2, "pts": [[12.783141, 77.497393], [12.783215, 77.497266], [12.782998, 77.497134], [12.782925, 77.497261]]}
     ];
 
     // ================= MAP + THEMES =================
@@ -439,10 +543,8 @@
     const ATTR = 'Tiles &copy; Esri';
 
     const TILES = {
-      neon:      L.tileLayer(ESRI_IMAGERY, { maxZoom: 19, attribution: ATTR, className: 'tiles-neon' }),
-      aurora:    L.tileLayer(ESRI_IMAGERY, { maxZoom: 19, attribution: ATTR, className: 'tiles-aurora' }),
-      satellite: L.tileLayer(ESRI_IMAGERY, { maxZoom: 19, attribution: ATTR }),
-      sunset:    L.tileLayer(ESRI_IMAGERY, { maxZoom: 19, attribution: ATTR, className: 'tiles-sunset' })
+      dark:  L.tileLayer(ESRI_IMAGERY, { maxZoom: 19, attribution: ATTR, className: 'tiles-dark' }),
+      light: L.tileLayer(ESRI_IMAGERY, { maxZoom: 19, attribution: ATTR, className: 'tiles-light' })
     };
     let currentTile = null;
 
@@ -450,7 +552,7 @@
       document.body.dataset.theme = name;
       if (currentTile) map.removeLayer(currentTile);
       currentTile = TILES[name].addTo(map);
-      document.querySelectorAll('.swatch').forEach(s => s.classList.toggle('active', s.dataset.t === name));
+      document.getElementById('themeBtn').textContent = name === 'dark' ? '☀️ Bright' : '🌙 Dark';
       try { localStorage.setItem('campusTheme', name); } catch (e) {}
       redrawPoints();
       redrawRoute();
@@ -478,7 +580,10 @@
         </div>
         <p class="pop-info">${f.info}</p>
         ${f.timings ? `<p class="pop-time">🕒 ${f.timings}</p>` : ''}
-        <button class="dir" onclick="startDirections(${f.id})">🧭 Directions to here</button>`;
+        <div class="pop-btns">
+          <button class="dir" onclick="startDirections(${f.id})">🧭 Directions</button>
+          <button class="dir alt" onclick="sharePlace(${f.id})" title="Share this place (QR code)">🔗 Share</button>
+        </div>`;
     }
 
     function setActive(id) {
@@ -641,6 +746,38 @@
       else { document.execCommand('copy'); done(); }
     };
 
+    // ================= 3D BUILDING HELPERS =================
+    const FLOOR_H = 3.4;                        // metres per floor in the 3D view
+    const bld = BUILDINGS;
+    function pointInPoly(pt, poly) {
+      let c = false;
+      for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+        const a = poly[i], b = poly[j];
+        if ((a[0] > pt[0]) !== (b[0] > pt[0]) && pt[1] < (b[1] - a[1]) * (pt[0] - a[0]) / (b[0] - a[0]) + a[1]) c = !c;
+      }
+      return c;
+    }
+    function facilityCovered(f) {               // a building outline already marks this place, so no generic block is needed
+      const p = [f.lat, f.lng];
+      return bld.some(b => pointInPoly(p, b.pts) || b.pts.some(q => hav(p, q) < 25));
+    }
+    function mixHex(a, b, t) {
+      const p = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)), x = p(a), y = p(b);
+      return '#' + x.map((v, i) => Math.round(v + (y[i] - v) * t).toString(16).padStart(2, '0')).join('');
+    }
+    function glCustom() {                       // the building outlines, as 3D shapes
+      const dark = document.body.dataset.theme !== 'light';
+      return { type: 'FeatureCollection', features: bld.map(b => {
+        const col = (TYPE[b.type] || {}).color || '#818cf8', ring = b.pts.map(p => [p[1], p[0]]); ring.push(ring[0]);
+        return { type: 'Feature', properties: { wall: mixHex(col, dark ? '#aab4ff' : '#ffffff', 0.62), roof: b.roof || col, height: Math.max(1, b.floors || 1) * FLOOR_H },
+                 geometry: { type: 'Polygon', coordinates: [ring] } };
+      }) };
+    }
+    function beamRing(p) {                      // a tall light beam on the destination
+      const d = 2.5, a = d / 111320, o = d / (111320 * Math.cos(p[0] * Math.PI / 180));
+      return [[p[1] - o, p[0] - a], [p[1] + o, p[0] - a], [p[1] + o, p[0] + a], [p[1] - o, p[0] + a], [p[1] - o, p[0] - a]];
+    }
+
     // ================= WALKING ROUTES (from your Path tool points) =================
     // Each line is one walking route: from a place, through the points you clicked, to another place.
     // To add a new route later, just add one more line here.
@@ -657,11 +794,14 @@
       { from: 5,  to: 9,  pts: [[12.783655, 77.496606], [12.783299, 77.497821], [12.783943, 77.497977], [12.783822, 77.498530]] },
       { from: 9,  to: 12, pts: [[12.783815, 77.498524], [12.783956, 77.497977], [12.784709, 77.498116], [12.785776, 77.496931], [12.787267, 77.497494], [12.787126, 77.498347], [12.787586, 77.498551], [12.788151, 77.498723], [12.788774, 77.497741]] },
       { from: 12, to: 6,  pts: [[12.788769, 77.497736], [12.788157, 77.498733], [12.787602, 77.498562], [12.786315, 77.502220]] },
-      { from: 15, to: 17, pts: [[12.783428, 77.497344], [12.783333, 77.497784], [12.784040, 77.497945], [12.784401, 77.496614]] },
-      { from: 17, to: 16, pts: [[12.784411, 77.496614], [12.784040, 77.497950], [12.783333, 77.497784], [12.783098, 77.498342], [12.782972, 77.498310]] },
+      { from: 15, to: 17, pts: [[12.783428, 77.497344], [12.783452, 77.497873], [12.784033, 77.497964], [12.784338, 77.496631], [12.784082, 77.496556]] },
+      { from: 17, to: 16, pts: [[12.784082, 77.496556], [12.784338, 77.496631], [12.784033, 77.497964], [12.783452, 77.497873], [12.783098, 77.498342], [12.782972, 77.498310]] },
       { from: 16, to: 18, pts: [[12.782978, 77.498310], [12.783103, 77.498342], [12.783318, 77.497805], [12.784735, 77.498127], [12.785808, 77.496931], [12.787330, 77.497602], [12.787184, 77.498229], [12.787524, 77.498358]] },
       { from: 6,  to: 18, pts: [[12.786336, 77.502129], [12.787634, 77.498460]] },
-      { from: 18, to: 14, pts: [[12.787634, 77.498444], [12.787450, 77.499002], [12.787314, 77.498943]] }
+      { from: 18, to: 14, pts: [[12.787634, 77.498444], [12.787450, 77.499002], [12.787314, 77.498943]] },
+      { from: 15, to: 19, pts: [[12.783393, 77.497240], [12.783356, 77.497408], [12.783167, 77.497293]] },
+      { from: 2,  to: 20, pts: [[12.783501, 77.497903], [12.784768, 77.498084], [12.785512, 77.497302]] },
+      { from: 6,  to: 20, pts: [[12.786307, 77.502179], [12.787544, 77.498568], [12.787094, 77.498353], [12.787338, 77.497594], [12.785807, 77.496908], [12.785512, 77.497261], [12.785622, 77.497293]] }
     ];
 
     const WALK_M_PER_MIN = 80;   // walking speed used for the time estimate
@@ -804,8 +944,122 @@
       flush();
     }
 
-    function updateDirections() {
+    // >>> steps
+    // ---------- turn-by-turn steps ----------
+    const MIN_SEG = 6;      // path points closer than this (metres) count as one point
+    const TURN_MIN = 40;    // direction changes smaller than this (degrees) count as "keep going straight"
+    const ARRIVE_M = 20;    // live tracking: you have arrived when this close (metres) to the destination
+    let currentSteps = [], tracking = false, watchId = null, follow = true, stepsOpen = true;
+    let lastTick = null, lastTickTime = 0, wakeLock = null;
+
+    function bearing(a, b) {
+      const rad = Math.PI / 180, dL = (b[1] - a[1]) * rad;
+      const y = Math.sin(dL) * Math.cos(b[0] * rad);
+      const x = Math.cos(a[0] * rad) * Math.sin(b[0] * rad) - Math.sin(a[0] * rad) * Math.cos(b[0] * rad) * Math.cos(dL);
+      return (Math.atan2(y, x) / rad + 360) % 360;
+    }
+    function compass(b) { return ['north', 'north-east', 'east', 'south-east', 'south', 'south-west', 'west', 'north-west'][Math.round(b / 45) % 8]; }
+    function fmtDist(m) {
+      const r = m >= 30 ? Math.round(m / 5) * 5 : Math.max(1, Math.round(m));
+      return r >= 1000 ? (r / 1000).toFixed(2) + ' km' : r + ' m';
+    }
+    function placeName(id) { const f = facilities.find(x => x.id === id); return f ? f.name : ''; }
+    function nearbyPlace(p, skip) {
+      let best = null, bd = 25;
+      facilities.forEach(f => {
+        if (skip.includes(f.id)) return;
+        const d = hav([p.lat, p.lng], [f.lat, f.lng]);
+        if (d < bd) { bd = d; best = f; }
+      });
+      return best;
+    }
+    function turnInfo(diff) {
+      const a = Math.abs(diff), side = diff > 0 ? 'right' : 'left';
+      if (a >= 155) return { icon: '↩️', text: 'Make a U-turn' };
+      if (a >= 125) return { icon: diff > 0 ? '↘️' : '↙️', text: 'Take a sharp ' + side };
+      if (a >= 60)  return { icon: diff > 0 ? '➡️' : '⬅️', text: 'Turn ' + side };
+      return { icon: diff > 0 ? '↗️' : '↖️', text: 'Bear ' + side };
+    }
+
+    // turns a route (list of graph nodes) into a list of steps: start, turns / landmarks, arrive
+    function buildSteps(r, fromKey, toId) {
+      const P = [];
+      r.nodes.forEach((ni, k) => {
+        const nd = G.nodes[ni];
+        const p = { lat: nd.lat, lng: nd.lng, fid: nd.fid };
+        const isLast = k === r.nodes.length - 1;
+        if (P.length) {
+          const last = P[P.length - 1];
+          if (!(p.fid || isLast) && hav([last.lat, last.lng], [p.lat, p.lng]) < MIN_SEG) return;   // tiny wiggle: skip it
+          if (p.fid || isLast) {
+            while (P.length > 1 && !P[P.length - 1].fid && hav([P[P.length - 1].lat, P[P.length - 1].lng], [p.lat, p.lng]) < MIN_SEG) P.pop();
+          }
+        }
+        P.push(p);
+      });
+      // remove small zigzags (where two hand-drawn routes meet and the line briefly doubles back)
+      for (let again = true; again;) {
+        again = false;
+        for (let i = 1; i < P.length - 1; i++) {
+          if (P[i].fid) continue;
+          const A = [P[i - 1].lat, P[i - 1].lng], B = [P[i].lat, P[i].lng], C = [P[i + 1].lat, P[i + 1].lng];
+          const back = Math.abs(((bearing(B, C) - bearing(A, B) + 540) % 360) - 180) >= 150;
+          if (back && Math.min(hav(A, B), hav(B, C)) < 15) { P.splice(i, 1); again = true; break; }
+        }
+      }
+      const destName = placeName(toId);
+      if (P.length < 2) return [{ icon: '🏁', text: 'Arrive at ' + destName, at: P[0], cum: 0, dist: 0 }];
+
+      const seg = [], cum = [0];
+      for (let i = 1; i < P.length; i++) {
+        const a = [P[i - 1].lat, P[i - 1].lng], b = [P[i].lat, P[i].lng];
+        seg.push({ b: bearing(a, b) });
+        cum.push(cum[i - 1] + hav(a, b));
+      }
+      const skip = [toId]; if (fromKey !== 'me') skip.push(fromKey);
+      const steps = [];
+      steps.push({
+        icon: '🚶', at: P[0], cum: 0,
+        text: fromKey === 'me' ? 'Head ' + compass(seg[0].b) : 'Start at ' + placeName(fromKey) + ' and head ' + compass(seg[0].b)
+      });
+      let ref = seg[0].b;
+      for (let i = 1; i < P.length - 1; i++) {
+        const nb = seg[i].b;
+        const diff = ((nb - ref + 540) % 360) - 180;          // -180..180, positive = right
+        const here = P[i];
+        const near = here.fid ? { name: placeName(here.fid), at: true } : (nearbyPlace(here, skip) ? { name: nearbyPlace(here, skip).name, at: false } : null);
+        if (Math.abs(diff) >= TURN_MIN) {
+          const m = turnInfo(diff);
+          steps.push({ icon: m.icon, at: here, cum: cum[i], text: m.text + (near ? (near.at ? ' at ' : ' near ') + near.name : '') });
+          ref = nb;
+        } else if (here.fid) {
+          steps.push({ icon: '📍', at: here, cum: cum[i], text: 'Pass ' + placeName(here.fid) });
+        }
+      }
+      steps.push({ icon: '🏁', at: P[P.length - 1], cum: cum[P.length - 1], text: 'Arrive at ' + destName });
+      steps.forEach((st, i) => { st.dist = i < steps.length - 1 ? steps[i + 1].cum - st.cum : 0; });
+      return steps;
+    }
+
+    function stepsHTML(steps, nowIdx) {
+      return '<ol class="steps">' + steps.map((s, i) =>
+        `<li class="step${i === nowIdx ? ' now' : ''}" onclick="focusStep(${i})"><span class="si">${s.icon}</span><div><div class="st">${s.text}</div>${s.dist ? `<div class="sd">Walk ${fmtDist(s.dist)}</div>` : ''}</div></li>`
+      ).join('') + '</ol>';
+    }
+    function focusStep(i) {
+      const s = currentSteps[i];
+      if (!s) return;
+      setFollow(false);
+      map.flyTo([s.at.lat, s.at.lng], 19, { duration: 0.8 });
+      if (window.innerWidth <= 700) document.getElementById('panel').classList.add('hidden');
+    }
+    // <<< steps
+
+    function updateDirections(live, noFit) {
+      if (flyOn) stopFly();
+      const keepScroll = dirBox.scrollTop;
       lastRoute = null;
+      currentSteps = [];
       routeLayer.clearLayers();
       const a = dirFrom.value === 'me' ? 'me' : Number(dirFrom.value), b = Number(dirTo.value);
       if (!a || !b) { dirResult.innerHTML = '<p class="dir-hint">Choose a starting point and a destination.</p>'; return; }
@@ -818,10 +1072,20 @@
       if (!r) { dirResult.innerHTML = '<p class="dir-hint">Sorry, no walking route found between these places.</p>'; return; }
       lastRoute = r;
       drawRoute();
+      currentSteps = buildSteps(r, a, b);
       const meters = Math.round(r.dist);
       const mins = Math.max(1, Math.round(r.dist / WALK_M_PER_MIN));
       const dist = meters >= 1000 ? (meters / 1000).toFixed(2) + ' km' : meters + ' m';
-      let html = `<div class="dir-stats"><span>🚶 ${dist}</span><span>⏱ ~${mins} min</span></div>`;
+
+      let html = '';
+      if (live && currentSteps.length > 1) {
+        const nx = currentSteps[1];
+        html += `<div class="live-card"><div class="big">${nx.icon}</div><div><div class="t1">In ${fmtDist(currentSteps[0].dist)}: ${nx.text}</div><div class="t2">📡 Live · ${dist} left · ~${mins} min</div></div></div>`;
+        html += `<div class="dir-actions"><button class="btn" id="followBtn" onclick="recenter()">${follow ? '🎯 Following you' : '🎯 Recenter'}</button><button class="btn" onclick="stopTracking()">⏹ Stop</button></div>`;
+      } else {
+        html += `<div class="dir-stats"><span>🚶 ${dist}</span><span>⏱ ~${mins} min</span></div>`;
+        html += `<div class="dir-actions"><button class="btn primary" onclick="startTracking()">📡 Start live tracking</button><button class="btn" onclick="startFly()">🎬 3D preview</button><button class="btn" onclick="shareRoute()">🔗 Share route</button></div>`;
+      }
       const missing = [a, b].filter(id => noRoutePlaces.has(id)).map(id => facilities.find(f => f.id === id).name);
       if (missing.length) {
         html += `<p class="dir-warn">⚠ The dotted part is a straight line, because the walking path to ${missing.join(' and ')} is not drawn yet.</p>`;
@@ -829,10 +1093,14 @@
       if (a === 'me' && myGap > FAR_DIST) {
         html += `<p class="dir-warn">⚠ The dotted part joins your location to the nearest campus path (${Math.round(myGap)} m away).</p>`;
       }
+      html += `<details id="stepsDet" ${stepsOpen ? 'open' : ''} ontoggle="stepsOpen = this.open"><summary class="steps-sum">🧭 Step-by-step (${currentSteps.length} steps)</summary>${stepsHTML(currentSteps, live ? 0 : -1)}</details>`;
       dirResult.innerHTML = html;
-      setActive(b);
-      map.closePopup();
-      map.fitBounds(L.latLngBounds(pts_of(r)), { padding: [70, 70], maxZoom: 19 });
+      dirBox.scrollTop = keepScroll;
+      if (!live) {
+        setActive(b);
+        map.closePopup();
+        if (!noFit) map.fitBounds(L.latLngBounds(pts_of(r)), { padding: [70, 70], maxZoom: 19 });
+      }
     }
     function pts_of(r) { return r.nodes.map(i => [G.nodes[i].lat, G.nodes[i].lng]); }
 
@@ -842,6 +1110,8 @@
       document.getElementById('panel').classList.add('dir-open');
     }
     function closeDirBox() {
+      stopFly();
+      stopTracking(true);
       dirBox.classList.remove('show');
       document.getElementById('panel').classList.remove('dir-open');
       lastRoute = null;
@@ -851,13 +1121,32 @@
       openDirBox();
       dirTo.value = String(toId);
       if (dirFrom.value === String(toId)) dirFrom.value = '';
-      updateDirections();
+      updateDirections(tracking);
     }
     function redrawRoute() { drawRoute(); }
 
     // ---------- use my location ----------
     const meLayer = L.layerGroup().addTo(map);
-    let myGap = 0, meOptionAdded = false;
+    let myGap = 0, meOptionAdded = false, meDot = null, meCircle = null;
+
+    // blue dot + accuracy circle (moved, not re-created, so live tracking stays smooth)
+    function showMe(lat, lng, acc) {
+      const rad = Math.min(acc || 0, 150);
+      if (!meDot) {
+        meCircle = L.circle([lat, lng], { radius: rad, color: '#3b82f6', weight: 1, fillColor: '#3b82f6', fillOpacity: 0.15 }).addTo(meLayer);
+        meDot = L.circleMarker([lat, lng], { radius: 8, color: '#ffffff', weight: 3, fillColor: '#3b82f6', fillOpacity: 1 })
+          .bindTooltip('You are here', { direction: 'top' }).addTo(meLayer);
+      } else {
+        meCircle.setLatLng([lat, lng]); meCircle.setRadius(rad); meDot.setLatLng([lat, lng]);
+      }
+    }
+    function ensureMeOption() {
+      if (meOptionAdded) return;
+      const o = document.createElement('option');
+      o.value = 'me'; o.textContent = '📍 My location';
+      dirFrom.add(o, 1);
+      meOptionAdded = true;
+    }
 
     function locateMe(onDone) {
       openDirBox();
@@ -868,17 +1157,9 @@
       dirResult.innerHTML = '<p class="dir-hint">📡 Finding your location...</p>';
       navigator.geolocation.getCurrentPosition(pos => {
         const lat = pos.coords.latitude, lng = pos.coords.longitude, acc = pos.coords.accuracy || 0;
-        meLayer.clearLayers();
-        L.circle([lat, lng], { radius: Math.min(acc, 150), color: '#3b82f6', weight: 1, fillColor: '#3b82f6', fillOpacity: 0.15 }).addTo(meLayer);
-        L.circleMarker([lat, lng], { radius: 8, color: '#ffffff', weight: 3, fillColor: '#3b82f6', fillOpacity: 1 })
-          .bindTooltip('You are here', { direction: 'top' }).addTo(meLayer);
+        showMe(lat, lng, acc);
         myGap = setMyLocation(lat, lng);
-        if (!meOptionAdded) {
-          const o = document.createElement('option');
-          o.value = 'me'; o.textContent = '📍 My location';
-          dirFrom.add(o, 1);
-          meOptionAdded = true;
-        }
+        ensureMeOption();
         dirFrom.value = 'me';
         if (typeof onDone === 'function') { onDone(); return; }
         if (myGap > OFF_CAMPUS) { updateDirections(); return; }
@@ -897,8 +1178,8 @@
     }
     document.getElementById('dirLocate').onclick = () => locateMe();
 
-    dirFrom.addEventListener('change', updateDirections);
-    dirTo.addEventListener('change', updateDirections);
+    dirFrom.addEventListener('change', () => { if (tracking && dirFrom.value !== 'me') stopTracking(true); updateDirections(tracking); });
+    dirTo.addEventListener('change', () => updateDirections(tracking));
     document.getElementById('dirSwap').onclick = () => {
       if (dirFrom.value === 'me') return;
       const t = dirFrom.value; dirFrom.value = dirTo.value; dirTo.value = t; updateDirections();
@@ -908,6 +1189,422 @@
       if (dirBox.classList.contains('show')) closeDirBox(); else { openDirBox(); updateDirections(); }
     };
 
+
+    // ================= LIVE TRACKING =================
+    // Watches your GPS, moves the blue dot, re-plans the route from where you are and updates the next-turn card.
+    // (Phones only give GPS to https:// pages, so this works on your GitHub link, not on a file opened from disk.)
+    function setFollow(v) { follow = v; updateFollowBtn(); }
+    function updateFollowBtn() {
+      const b = document.getElementById('followBtn');
+      if (b) b.textContent = follow ? '🎯 Following you' : '🎯 Recenter';
+    }
+    function followTo(lat, lng, z) {
+      z = z || Math.max(map.getZoom(), 17);
+      let target = L.latLng(lat, lng);
+      const panel = document.getElementById('panel');
+      if (!panel.classList.contains('hidden')) {
+        // shift the view so your dot sits in the part of the map that the panel does not cover
+        const pt = map.project(target, z);
+        if (window.innerWidth <= 700) pt.y += panel.offsetHeight / 2; else pt.x -= (panel.offsetWidth + 14) / 2;
+        target = map.unproject(pt, z);
+      }
+      map.setView(target, z, { animate: true, duration: 0.5 });
+    }
+    function recenter() {
+      setFollow(true);
+      if (meDot) { const p = meDot.getLatLng(); followTo(p.lat, p.lng); }
+    }
+    map.on('dragstart', () => { if (tracking && follow) setFollow(false); });
+
+    async function keepAwake(on) {
+      try {
+        if (on && 'wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen');
+        else if (!on && wakeLock) { await wakeLock.release(); wakeLock = null; }
+      } catch (e) {}
+    }
+    document.addEventListener('visibilitychange', () => { if (tracking && document.visibilityState === 'visible') keepAwake(true); });
+
+    function startTracking() {
+      stopFly();
+      openDirBox();
+      if (!navigator.geolocation) { dirResult.innerHTML = '<p class="dir-warn">⚠ Your browser does not support location.</p>'; return; }
+      if (!dirTo.value) { dirResult.innerHTML = '<p class="dir-hint">Choose a destination (B) first, then start live tracking.</p>'; return; }
+      if (watchId !== null) return;
+      tracking = true; follow = true; lastTick = null;
+      stepsOpen = window.innerWidth > 700;          // keep the phone panel small: steps stay folded while walking
+      keepAwake(true);
+      dirResult.innerHTML = '<p class="dir-hint">📡 Finding your location... allow location access if your browser asks.</p>';
+      watchId = navigator.geolocation.watchPosition(onTrackPos, onTrackErr, { enableHighAccuracy: true, maximumAge: 2000, timeout: 20000 });
+    }
+
+    function stopTracking(keepUI) {
+      if (watchId !== null) navigator.geolocation.clearWatch(watchId);
+      watchId = null; tracking = false; lastTick = null;
+      keepAwake(false);
+      if (!keepUI && dirBox.classList.contains('show')) updateDirections(false, true);
+    }
+
+    function onTrackPos(pos) {
+      const lat = pos.coords.latitude, lng = pos.coords.longitude, acc = pos.coords.accuracy || 0;
+      showMe(lat, lng, acc);
+      const first = !lastTick, now = Date.now();
+      if (!first && hav(lastTick, [lat, lng]) < 2 && now - lastTickTime < 4000) return;   // barely moved: skip the update
+      lastTick = [lat, lng]; lastTickTime = now;
+      myGap = setMyLocation(lat, lng);
+      ensureMeOption();
+      dirFrom.value = 'me';
+      const dest = facilities.find(f => f.id === Number(dirTo.value));
+      if (!dest) { stopTracking(true); return; }
+      if (hav([lat, lng], [dest.lat, dest.lng]) <= ARRIVE_M) {
+        stopTracking(true);
+        lastRoute = null; currentSteps = []; routeLayer.clearLayers();
+        dirResult.innerHTML = `<div class="live-card"><div class="big">🏁</div><div><div class="t1">You have arrived at ${dest.name}!</div><div class="t2">Live tracking stopped.</div></div></div>`;
+        return;
+      }
+      updateDirections(true, true);
+      if (follow && myGap <= OFF_CAMPUS) followTo(lat, lng, first ? 18 : null);
+    }
+
+    function onTrackErr(err) {
+      if (err.code === 1) {
+        stopTracking(true);
+        dirResult.innerHTML = '<p class="dir-warn">⚠ Location permission was denied. Allow location for this page in your browser, then try again.</p><p class="dir-hint">Note: location only works on https:// links or on localhost, not when the file is opened directly.</p>';
+      } else if (!lastTick) {
+        dirResult.innerHTML = '<p class="dir-warn">⚠ Still looking for your location. Make sure GPS/location is on (it works best outdoors).</p>';
+      }
+    }
+
+
+    // ================= 3D FLY-THROUGH =================
+    // Real 3D: a MapLibre GL scene with extruded OpenStreetMap buildings on top of the satellite map.
+    // A glowing marker walks the route and the camera follows it, turning with the path.
+    // If the phone/browser cannot do WebGL (or MapLibre fails to load), it falls back to the older
+    // tilted-camera effect on the flat Leaflet map, so the button always does something.
+    const flyLayer = L.layerGroup().addTo(map);
+    let flyOn = false, flyPaused = false, flyDone = false, flyRaf = 0, flyT = 0, flyLast = 0, flyData = null;
+    let flyTimer = 0, tiltTimer = 0, panelWasHidden = false, flyWalker = null, flyGlow = null, flyCore = null;
+    let flyMode = 'tilt';                       // 'gl' = real 3D, 'tilt' = fallback
+    let gl = null, glWalker = null, glMarkers = [], glBear = 0, glLoadTimer = 0, glFrameNo = 0;
+
+    // Height (metres) of the coloured landmark block drawn at each place. These blocks make sure every
+    // place is visible in 3D even where OpenStreetMap has no building drawn. Change the numbers freely.
+    const GL_HEIGHT = { Academic: 26, Administration: 24, Library: 22, Hostel: 22, Temple: 20, Auditorium: 20, Placement: 18, Food: 14, Lab: 14, Entrance: 12, Utility: 0.4, Sports: 0.4 };
+    const GL_BLOCK_HALF = 5;                    // half the block width in metres (5 = a 10 m x 10 m block)
+
+    function accent2Color() { return getComputedStyle(document.body).getPropertyValue('--accent2').trim() || '#ff2bd6'; }
+    function walkerIcon() {
+      return L.divIcon({
+        className: '', iconSize: [0, 0], iconAnchor: [0, 0],
+        html: '<div class="walker"><div class="w-ring"></div><div class="w-shadow"></div><div class="w-dot"></div></div>'
+      });
+    }
+    function setInteractions(on) {
+      ['dragging', 'touchZoom', 'scrollWheelZoom', 'doubleClickZoom', 'boxZoom', 'keyboard'].forEach(h => { if (map[h]) map[h][on ? 'enable' : 'disable'](); });
+    }
+    function setTilt(on) {
+      const wrap = document.getElementById('mapWrap');
+      clearTimeout(tiltTimer);
+      if (on) {
+        wrap.classList.add('big');
+        map.invalidateSize({ animate: false });
+        void wrap.offsetWidth;                      // let the browser apply the bigger size first, so the tilt can animate
+        wrap.classList.add('tilt');
+      } else {
+        wrap.classList.remove('tilt');
+        tiltTimer = setTimeout(() => { wrap.classList.remove('big'); map.invalidateSize({ animate: false }); }, 950);
+      }
+    }
+    function updateHud(p) {
+      document.getElementById('flyFill').style.width = Math.round(p * 100) + '%';
+    }
+
+    // ---------- helpers for the real-3D scene ----------
+    function glSupported() {
+      try {
+        if (!window.maplibregl) return false;
+        const c = document.createElement('canvas');
+        return !!(c.getContext('webgl2') || c.getContext('webgl'));
+      } catch (e) { return false; }
+    }
+    const lngLat = p => [p[1], p[0]];           // route points are [lat, lng]; MapLibre wants [lng, lat]
+    function lineFeature(coords) {
+      if (coords.length === 1) coords = [coords[0], coords[0]];
+      return { type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: coords } };
+    }
+    function bearingDeg(a, b) {
+      const r = Math.PI / 180, dl = (b[1] - a[1]) * r;
+      const y = Math.sin(dl) * Math.cos(b[0] * r);
+      const x = Math.cos(a[0] * r) * Math.sin(b[0] * r) - Math.sin(a[0] * r) * Math.cos(b[0] * r) * Math.cos(dl);
+      return (Math.atan2(y, x) / r + 360) % 360;
+    }
+    function posAtDist(s) {                     // point on the route after walking s metres
+      const pts = flyData.pts, cum = flyData.cum;
+      let lo = 0, hi = pts.length - 2;
+      while (lo < hi) { const mid = (lo + hi + 1) >> 1; if (cum[mid] <= s) lo = mid; else hi = mid - 1; }
+      const seg = (cum[lo + 1] - cum[lo]) || 1, f = Math.min(1, Math.max(0, (s - cum[lo]) / seg));
+      return [pts[lo][0] + (pts[lo + 1][0] - pts[lo][0]) * f, pts[lo][1] + (pts[lo + 1][1] - pts[lo][1]) * f];
+    }
+    function headingAt(s) {                     // which way the path points a little ahead of s
+      const a = posAtDist(s), b = posAtDist(Math.min(flyData.total, s + 40));
+      return hav(a, b) < 2 ? null : bearingDeg(a, b);
+    }
+    function glBlocks() {
+      return {
+        type: 'FeatureCollection',
+        features: facilities.filter(f => !facilityCovered(f)).map(f => {
+          const dLat = GL_BLOCK_HALF / 111320, dLng = GL_BLOCK_HALF / (111320 * Math.cos(f.lat * Math.PI / 180));
+          return {
+            type: 'Feature', properties: { color: TYPE[f.type].color, height: GL_HEIGHT[f.type] || 14 },
+            geometry: { type: 'Polygon', coordinates: [[
+              [f.lng - dLng, f.lat - dLat], [f.lng + dLng, f.lat - dLat], [f.lng + dLng, f.lat + dLat],
+              [f.lng - dLng, f.lat + dLat], [f.lng - dLng, f.lat - dLat]
+            ]] }
+          };
+        })
+      };
+    }
+    function glStyle(theme, c2, routeCoords, beam) {
+      const dark = theme === 'dark';
+      const h = ['coalesce', ['get', 'render_height'], 6];
+      return {
+        version: 8,
+        light: { anchor: 'map', position: [1.2, 210, 35], color: '#ffffff', intensity: dark ? 0.4 : 0.55 },
+        sources: {
+          sat: { type: 'raster', tiles: [ESRI_IMAGERY], tileSize: 256, maxzoom: 19, attribution: ATTR },
+          osm: {
+            type: 'vector', url: 'https://tiles.openfreemap.org/planet',
+            attribution: '<a href="https://openfreemap.org" target="_blank">OpenFreeMap</a> &copy; <a href="https://www.openmaptiles.org/" target="_blank">OpenMapTiles</a> Data from <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>'
+          },
+          blocks: { type: 'geojson', data: glBlocks() },
+          custom: { type: 'geojson', data: glCustom() },
+          beam:   { type: 'geojson', data: { type: 'Feature', properties: {}, geometry: { type: 'Polygon', coordinates: [beam] } } },
+          path:   { type: 'geojson', data: lineFeature(routeCoords) },
+          trail:  { type: 'geojson', data: lineFeature([routeCoords[0]]) }
+        },
+        layers: [
+          { id: 'bg', type: 'background', paint: { 'background-color': dark ? '#0b0d1a' : '#e8eaf6' } },
+          { id: 'sat', type: 'raster', source: 'sat', paint: dark
+              ? { 'raster-hue-rotate': 180, 'raster-brightness-max': 0.65, 'raster-saturation': -0.1, 'raster-contrast': 0.2 }
+              : { 'raster-brightness-min': 0.15, 'raster-saturation': -0.4, 'raster-contrast': -0.1 } },
+          { id: 'buildings', type: 'fill-extrusion', source: 'osm', 'source-layer': 'building', minzoom: 14, layout: { visibility: bld.length ? 'none' : 'visible' },
+            paint: {
+              'fill-extrusion-color': dark
+                ? ['interpolate', ['linear'], h, 0, '#4a54a8', 30, '#8a96ff']
+                : ['interpolate', ['linear'], h, 0, '#b4b9f2', 30, '#ffffff'],
+              'fill-extrusion-height': h,
+              'fill-extrusion-base': ['coalesce', ['get', 'render_min_height'], 0],
+              'fill-extrusion-opacity': 0.9
+            } },
+          { id: 'blocks', type: 'fill-extrusion', source: 'blocks',
+            paint: {
+              'fill-extrusion-color': ['get', 'color'],
+              'fill-extrusion-height': ['get', 'height'],
+              'fill-extrusion-base': 0,
+              'fill-extrusion-opacity': 0.85
+            } },
+          { id: 'custom', type: 'fill-extrusion', source: 'custom',
+            paint: { 'fill-extrusion-color': ['get', 'wall'], 'fill-extrusion-height': ['get', 'height'], 'fill-extrusion-base': 0, 'fill-extrusion-opacity': 0.96 } },
+          { id: 'custom-edge', type: 'line', source: 'custom', layout: { 'line-join': 'round' },
+            paint: { 'line-color': ['get', 'roof'], 'line-width': 2.5, 'line-opacity': 0.9, 'line-blur': 0.5 } },
+          { id: 'custom-roof', type: 'fill-extrusion', source: 'custom',
+            paint: { 'fill-extrusion-color': ['get', 'roof'], 'fill-extrusion-base': ['get', 'height'], 'fill-extrusion-height': ['+', ['get', 'height'], 0.8], 'fill-extrusion-opacity': 1 } },
+          { id: 'beam', type: 'fill-extrusion', source: 'beam',
+            paint: { 'fill-extrusion-color': c2, 'fill-extrusion-base': 0, 'fill-extrusion-height': 70, 'fill-extrusion-opacity': 0.4 } },
+          { id: 'path', type: 'line', source: 'path', layout: { 'line-cap': 'round', 'line-join': 'round' },
+            paint: { 'line-color': c2, 'line-width': 4, 'line-opacity': 0.35 } },
+          { id: 'trail-glow', type: 'line', source: 'trail', layout: { 'line-cap': 'round', 'line-join': 'round' },
+            paint: { 'line-color': c2, 'line-width': 16, 'line-opacity': 0.35, 'line-blur': 6 } },
+          { id: 'trail-core', type: 'line', source: 'trail', layout: { 'line-cap': 'round', 'line-join': 'round' },
+            paint: { 'line-color': c2, 'line-width': 6, 'line-opacity': 1 } }
+        ]
+      };
+    }
+    function glPinEl(f, withLabel) {
+      const el = document.createElement('div');
+      el.className = 'gpin' + (withLabel ? ' big' : '');
+      el.style.setProperty('--c', TYPE[f.type].color);
+      const em = document.createElement('span'); em.textContent = TYPE[f.type].emoji; el.appendChild(em);
+      if (withLabel) { const b = document.createElement('b'); b.textContent = f.name; el.appendChild(b); }
+      return el;
+    }
+    function glTeardown() {
+      clearTimeout(glLoadTimer);
+      glMarkers.forEach(m => m.remove()); glMarkers = [];
+      if (glWalker) { glWalker.remove(); glWalker = null; }
+      if (gl) { try { gl.remove(); } catch (e) {} gl = null; }
+      document.getElementById('map3d').classList.remove('show');
+    }
+    function glSetTrail(coords) {
+      const src = gl && gl.getSource('trail');
+      if (src) src.setData(lineFeature(coords));
+    }
+
+    function startGL() {
+      const pts = flyData.pts, p0 = pts[0];
+      const theme = document.body.dataset.theme === 'light' ? 'light' : 'dark';
+      const a = dirFrom.value === 'me' ? null : Number(dirFrom.value), b = Number(dirTo.value);
+      glBear = headingAt(0) ?? 0;
+      glFrameNo = 0;
+      document.getElementById('map3d').classList.add('show');
+      gl = new maplibregl.Map({
+        container: 'gl3d',
+        style: glStyle(theme, accent2Color(), pts.map(lngLat), beamRing(pts[pts.length - 1])),
+        center: lngLat(p0), zoom: flyData.glZoom - 0.7, pitch: 0, bearing: glBear,
+        maxPitch: 80, maxZoom: 20, interactive: false, fadeDuration: 0,
+        attributionControl: { compact: true }
+      });
+      gl.on('error', e => console.warn('3D map:', e && e.error && e.error.message));
+      glMarkers = facilities.map(f => new maplibregl.Marker({ element: glPinEl(f, f.id === a || f.id === b), anchor: 'center' })
+        .setLngLat([f.lng, f.lat]).addTo(gl));
+      const wrap = document.createElement('div');
+      wrap.innerHTML = '<div class="walker"><div class="w-ring"></div><div class="w-shadow"></div><div class="w-dot"></div></div>';
+      glWalker = new maplibregl.Marker({ element: wrap, anchor: 'center' }).setLngLat(lngLat(p0)).addTo(gl);
+
+      let started = false;
+      const begin = () => {                      // tilt the camera in, then start walking
+        if (started || !flyOn || flyMode !== 'gl') return;
+        started = true; clearTimeout(glLoadTimer);
+        gl.easeTo({ pitch: 62, zoom: flyData.glZoom, bearing: glBear, duration: 1000,
+                    padding: { top: Math.round(window.innerHeight * 0.28), bottom: 0, left: 0, right: 0 } });
+        flyTimer = setTimeout(() => { if (!flyOn) return; flyLast = performance.now(); flyRaf = requestAnimationFrame(flyFrame); }, 1100);
+      };
+      gl.once('load', begin);
+      glLoadTimer = setTimeout(begin, 7000);     // slow network: start anyway
+    }
+
+    function startTilt() {
+      const pts = flyData.pts;
+      setInteractions(false);
+      setTilt(true);
+      flyLayer.clearLayers();
+      const c2 = accent2Color();
+      flyGlow = L.polyline([pts[0]], { color: c2, weight: 16, opacity: 0.35, lineCap: 'round', lineJoin: 'round', interactive: false }).addTo(flyLayer);
+      flyCore = L.polyline([pts[0]], { color: c2, weight: 6, opacity: 1, lineCap: 'round', lineJoin: 'round', interactive: false }).addTo(flyLayer);
+      flyWalker = L.marker(pts[0], { icon: walkerIcon(), interactive: false, keyboard: false, zIndexOffset: 3000 }).addTo(flyLayer);
+      map.setView(pts[0], flyData.zoom, { animate: false });
+      flyTimer = setTimeout(() => { if (!flyOn) return; flyLast = performance.now(); flyRaf = requestAnimationFrame(flyFrame); }, 1100);   // after the tilt-in
+    }
+
+    function startFly() {
+      if (!lastRoute || flyOn) return;
+      const pts = pts_of(lastRoute);
+      const cum = [0];
+      for (let i = 1; i < pts.length; i++) cum.push(cum[i - 1] + hav(pts[i - 1], pts[i]));
+      const total = cum[cum.length - 1];
+      if (pts.length < 2 || total < 5) return;
+      flyData = { pts, cum, total, idx: 0, dur: Math.min(40, Math.max(7, total / 45)) * 1000,
+                  zoom: total < 450 ? 19 : 18, glZoom: total < 450 ? 18.6 : 18 };
+      flyOn = true; flyPaused = false; flyDone = false; flyT = 0;
+      map.closePopup();
+      const panel = document.getElementById('panel');
+      panelWasHidden = panel.classList.contains('hidden');
+      panel.classList.add('hidden');                // full-screen view while it plays
+      document.getElementById('flyHud').classList.add('show');
+      document.getElementById('flyPause').textContent = '⏸';
+      document.getElementById('flyTxt').textContent = '🎬 3D preview';
+      updateHud(0);
+      clearTimeout(flyTimer);
+      flyMode = glSupported() ? 'gl' : 'tilt';
+      if (flyMode === 'gl') {
+        try { startGL(); return; }
+        catch (e) { console.warn('Real 3D failed, using the tilted view instead:', e); glTeardown(); flyMode = 'tilt'; }
+      }
+      startTilt();
+    }
+
+    function flyFrame(now) {
+      if (!flyOn) return;
+      const dt = now - flyLast; flyLast = now;
+      if (!flyPaused && !flyDone) flyT = Math.min(1, flyT + dt / flyData.dur);
+      const p = 0.5 * flyT + 0.5 * (0.5 - 0.5 * Math.cos(Math.PI * flyT));   // gentle start and stop
+      const s = p * flyData.total, pts = flyData.pts, cum = flyData.cum;
+      let i = flyData.idx;
+      while (i < pts.length - 2 && cum[i + 1] < s) i++;
+      flyData.idx = i;
+      const segLen = (cum[i + 1] - cum[i]) || 1;
+      const f = Math.min(1, Math.max(0, (s - cum[i]) / segLen));
+      const pos = [pts[i][0] + (pts[i + 1][0] - pts[i][0]) * f, pts[i][1] + (pts[i + 1][1] - pts[i][1]) * f];
+
+      if (flyMode === 'gl') {
+        if (!gl) return;
+        glWalker.setLngLat(lngLat(pos));
+        if ((glFrameNo++ & 1) === 0 || flyT >= 1) {                       // trail every 2nd frame is plenty
+          const trail = pts.slice(0, i + 1).map(lngLat); trail.push(lngLat(pos));
+          glSetTrail(trail);
+        }
+        const target = flyDone ? null : headingAt(s);                     // turn the camera smoothly with the path
+        if (target !== null) {
+          const d = ((target - glBear + 540) % 360) - 180;
+          glBear = (glBear + d * (1 - Math.exp(-dt / 450)) + 360) % 360;
+        }
+        if (flyDone) glBear = (glBear + dt * 0.015) % 360;                // arrived: slow victory lap around the destination
+        gl.jumpTo({ center: lngLat(pos), bearing: glBear });
+      } else {
+        flyWalker.setLatLng(pos);
+        const trail = pts.slice(0, i + 1); trail.push(pos);
+        flyGlow.setLatLngs(trail); flyCore.setLatLngs(trail);
+        // camera: slide the map so the walker stays in the middle
+        const off = map.latLngToContainerPoint(pos).subtract(map.getSize().divideBy(2));
+        map.panBy(off, { animate: false });
+      }
+
+      updateHud(flyT);
+      if (flyT >= 1) {
+        flyDone = true;
+        document.getElementById('flyPause').textContent = '↻';
+        document.getElementById('flyTxt').textContent = '🏁 Arrived';
+        if (flyMode !== 'gl') return;
+      }
+      flyRaf = requestAnimationFrame(flyFrame);
+    }
+
+    function flyToggle() {
+      if (!flyOn) return;
+      if (flyDone) {                                 // replay
+        flyDone = false; flyPaused = false; flyT = 0; flyData.idx = 0;
+        const a = flyData.pts[0];
+        if (flyMode === 'gl' && gl) {
+          glBear = headingAt(0) ?? glBear;
+          glSetTrail([lngLat(a)]);
+          glWalker.setLngLat(lngLat(a));
+          gl.jumpTo({ center: lngLat(a), bearing: glBear });
+        } else {
+          map.setView(a, flyData.zoom, { animate: false });
+          flyGlow.setLatLngs([a]); flyCore.setLatLngs([a]); flyWalker.setLatLng(a);
+        }
+        document.getElementById('flyTxt').textContent = '🎬 3D preview';
+        flyLast = performance.now();
+        cancelAnimationFrame(flyRaf);
+        flyRaf = requestAnimationFrame(flyFrame);
+      } else {
+        flyPaused = !flyPaused;
+        flyLast = performance.now();
+      }
+      document.getElementById('flyPause').textContent = flyDone ? '↻' : (flyPaused ? '▶' : '⏸');
+    }
+
+    function stopFly() {
+      if (!flyOn) return;
+      flyOn = false;
+      cancelAnimationFrame(flyRaf); clearTimeout(flyTimer);
+      document.getElementById('flyHud').classList.remove('show');
+      if (flyMode === 'gl') {
+        glTeardown();                                // the flat Leaflet map underneath was never moved
+        if (!panelWasHidden) document.getElementById('panel').classList.remove('hidden');
+        return;
+      }
+      flyLayer.clearLayers();
+      setTilt(false);
+      setInteractions(true);
+      if (!panelWasHidden) document.getElementById('panel').classList.remove('hidden');
+      setTimeout(() => {                             // back to the normal flat view of the whole route
+        if (!flyOn && lastRoute) map.fitBounds(L.latLngBounds(pts_of(lastRoute)), { padding: [70, 70], maxZoom: 19 });
+      }, 1000);
+    }
+    document.getElementById('flyPause').onclick = flyToggle;
+    document.getElementById('flyClose').onclick = () => stopFly();
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') stopFly(); });
+
     // ================= NEAREST TO ME =================
     // To add a new button (for example restrooms), add a place with a new type in TYPE and facilities, then add a line here.
     const NEAR_OPTIONS = [
@@ -916,7 +1613,8 @@
       { label: 'Library', emoji: '📚', type: 'Library' },
       { label: 'Parking', emoji: '🅿️', type: 'Utility' },
       { label: 'Gate',    emoji: '🚪', type: 'Entrance' },
-      { label: 'Temple',  emoji: '🛕', type: 'Temple' }
+      { label: 'Temple',  emoji: '🛕', type: 'Temple' },
+      { label: 'Auditorium', emoji: '🎭', type: 'Auditorium' }
     ];
 
     function nearestTo(opt) {
@@ -950,31 +1648,60 @@
       });
     }
 
-    // ================= SHARE / QR =================
+    // ================= SHARE / QR + DIRECT LINKS =================
+    // Links look like:  <your link>?place=17     opens that place
+    //                   <your link>?from=1&to=17 opens walking directions between two places
+    //                   <your link>?to=17&go=1   starts live directions to that place from wherever the person is standing
     const shareModal = document.getElementById('shareModal');
     const qrBox = document.getElementById('qrBox');
-    let qrReady = false;
+    let shareUrl = PUBLIC_URL, shareFile = 'campus-navigator-qr.png';
 
-    function openShare() {
-      shareModal.classList.add('show');
-      document.getElementById('shareUrl').textContent = PUBLIC_URL;
+    function linkTo(params) {
+      const base = PUBLIC_URL.split(/[?#]/)[0];
+      return base + '?' + new URLSearchParams(params).toString();
+    }
+    function slug(t) { return t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
+
+    function openShare(opts) {
+      opts = opts || {};
+      shareUrl = opts.url || PUBLIC_URL;
+      shareFile = opts.file || 'campus-navigator-qr.png';
+      document.getElementById('shareTitle').textContent = opts.title || '🔗 Share Campus Navigator';
+      document.getElementById('shareDesc').textContent = opts.desc || 'Scan this QR code with a phone camera to open the app.';
+      document.getElementById('shareUrl').textContent = shareUrl;
       document.getElementById('nativeShareBtn').style.display = navigator.share ? '' : 'none';
-      if (qrReady) return;
+      shareModal.classList.add('show');
       qrBox.innerHTML = '';
       try {
         if (!window.QRCode) throw new Error('no QR library');
-        new QRCode(qrBox, { text: PUBLIC_URL, width: 220, height: 220, colorDark: '#000000', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M });
+        new QRCode(qrBox, { text: shareUrl, width: 220, height: 220, colorDark: '#000000', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M });
         document.getElementById('dlQrBtn').style.display = '';
       } catch (e) {
         // backup: online QR image (cannot be downloaded from here)
-        qrBox.innerHTML = '<img width="220" height="220" alt="QR code" src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=0&data=' + encodeURIComponent(PUBLIC_URL) + '">';
+        qrBox.innerHTML = '<img width="220" height="220" alt="QR code" src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=0&data=' + encodeURIComponent(shareUrl) + '">';
         document.getElementById('dlQrBtn').style.display = 'none';
       }
-      qrReady = true;
     }
     function closeShare() { shareModal.classList.remove('show'); }
 
-    document.getElementById('shareBtn').onclick = openShare;
+    function sharePlace(id) {
+      const f = facilities.find(x => x.id === id);
+      if (!f) return;
+      openShare({ url: linkTo({ place: id }), title: '🔗 ' + f.name, desc: 'Scan to open ' + f.name + ' on the campus map.', file: 'qr-' + slug(f.name) + '.png' });
+    }
+    function shareRoute() {
+      const a = dirFrom.value, b = Number(dirTo.value);
+      if (!b) return;
+      const to = placeName(b);
+      if (a && a !== 'me') {
+        const from = placeName(Number(a));
+        openShare({ url: linkTo({ from: a, to: b }), title: '🔗 Share route', desc: 'Scan to open walking directions from ' + from + ' to ' + to + '.', file: 'qr-route-' + slug(from) + '-to-' + slug(to) + '.png' });
+      } else {
+        openShare({ url: linkTo({ to: b, go: 1 }), title: '🧭 Navigate to ' + to, desc: 'Scan to get live walking directions to ' + to + ' from wherever you are standing.', file: 'qr-navigate-' + slug(to) + '.png' });
+      }
+    }
+
+    document.getElementById('shareBtn').onclick = () => openShare();
     document.getElementById('shareClose').onclick = closeShare;
     shareModal.addEventListener('click', e => { if (e.target === shareModal) closeShare(); });
 
@@ -982,13 +1709,13 @@
       const btn = e.currentTarget;
       const done = () => { btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = 'Copy link', 1400); };
       const fallback = () => {
-        const t = document.createElement('textarea'); t.value = PUBLIC_URL; document.body.appendChild(t);
+        const t = document.createElement('textarea'); t.value = shareUrl; document.body.appendChild(t);
         t.select(); try { document.execCommand('copy'); } catch (err) {} t.remove(); done();
       };
-      if (navigator.clipboard) navigator.clipboard.writeText(PUBLIC_URL).then(done).catch(fallback); else fallback();
+      if (navigator.clipboard) navigator.clipboard.writeText(shareUrl).then(done).catch(fallback); else fallback();
     };
     document.getElementById('nativeShareBtn').onclick = () => {
-      if (navigator.share) navigator.share({ title: 'Campus Navigator', text: 'Find your way around APS College of Engineering', url: PUBLIC_URL }).catch(() => {});
+      if (navigator.share) navigator.share({ title: 'Campus Navigator', text: 'Find your way around APS College of Engineering', url: shareUrl }).catch(() => {});
     };
     document.getElementById('dlQrBtn').onclick = () => {
       const src = qrBox.querySelector('canvas');
@@ -999,20 +1726,46 @@
       ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, c.width, c.height);
       ctx.drawImage(src, m, m);
       const a = document.createElement('a');
-      a.href = c.toDataURL('image/png'); a.download = 'campus-navigator-qr.png';
+      a.href = c.toDataURL('image/png'); a.download = shareFile;
       document.body.appendChild(a); a.click(); a.remove();
     };
 
+    // open the right thing when someone arrives through a direct link / QR code
+    function openFromLink() {
+      let q;
+      try { q = new URLSearchParams(location.search); } catch (e) { return; }
+      const find = v => facilities.find(f => String(f.id) === String(v));
+      const to = find(q.get('to')), from = find(q.get('from')), place = find(q.get('place'));
+      if (to) {
+        openDirBox();
+        dirTo.value = String(to.id);
+        if (from && from.id !== to.id) {
+          dirFrom.value = String(from.id);
+          updateDirections();
+        } else {
+          setActive(to.id);
+          map.flyTo([to.lat, to.lng], 18, { duration: 1 });
+          if (q.get('go') === '1') startTracking();
+          else dirResult.innerHTML = '<p class="dir-hint">📍 Tap the 📍 button to start from where you are, or choose a starting point (A).</p>';
+        }
+      } else if (place) {
+        selectFacility(place);
+      }
+    }
+
     // ================= START =================
-    document.querySelectorAll('.swatch').forEach(s => s.onclick = () => setTheme(s.dataset.t));
+    document.getElementById('themeBtn').onclick = () => setTheme(document.body.dataset.theme === 'dark' ? 'light' : 'dark');
     buildChips();
     buildNearRow();
     applyFilter();
-    let saved = 'neon';
-    try { saved = localStorage.getItem('campusTheme') || 'neon'; } catch (e) {}
-    setTheme(TILES[saved] ? saved : 'neon');
+    // Automatic theme: bright from 6 AM to 6 PM, dark at night. (The button still switches it by hand until the next change.)
+    const autoTheme = () => { const h = new Date().getHours(); return (h >= 6 && h < 18) ? 'light' : 'dark'; };
+    let autoPeriod = autoTheme();
+    setTheme(autoPeriod);
+    setInterval(() => { const p = autoTheme(); if (p !== autoPeriod) { autoPeriod = p; setTheme(p); } }, 60000);
     fitAll();
     updateLabels();
+    openFromLink();
   </script>
 </body>
 </html>
