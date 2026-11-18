@@ -150,6 +150,9 @@
     }
     .divider { width: 1px; height: 22px; background: var(--border); }
     #toggle { display: none; }
+    /* Path tool is for the admin only: hidden unless the link has ?admin=1 */
+    #toolBtn, #toolDivider { display: none; }
+    body.admin #toolBtn, body.admin #toolDivider { display: inline-block; }
 
     /* ---------- PATH TOOL BOX ---------- */
     #coordbox {
@@ -220,6 +223,7 @@
       color: #fff; background: var(--c);
     }
     .pop-info { margin: 10px 0; font-size: 12px; color: var(--muted); line-height: 1.45; }
+    .pop-photo { display: block; width: 100%; height: 110px; object-fit: cover; border-radius: 10px; margin: 0 0 10px; background: var(--card); }
     .pop-time { margin: -4px 0 10px; font-size: 12px; font-weight: 600; color: var(--accent); }
     .dir {
       width: 100%; padding: 8px; border: none; border-radius: 10px; font: 600 12px 'Poppins', sans-serif; color: #fff;
@@ -422,7 +426,7 @@
   <div id="controls" class="glass">
     <button class="btn" id="toggle">☰</button>
     <button class="btn" id="themeBtn" title="Switch between dark and bright"></button>
-    <div class="divider"></div>
+    <div class="divider" id="toolDivider"></div>
     <button class="btn" id="toolBtn">📍 Path tool: OFF</button>
   </div>
 
@@ -491,6 +495,12 @@
     // Each place can have:  info: "short description"   and (optional)   timings: "9:00 AM - 5:00 PM"
     // Timings show on the info card only when you add them. Example:
     //   { id: 10, name: "APS Library", ..., info: "Books and reading hall", timings: "9:00 AM - 5:00 PM" },
+    //
+    // PHOTOS: make a folder called  photos  next to index.html and put one picture per place in it, named after the place:
+    //   photos/aps-library.jpg   photos/canteen.jpg   photos/main-gate.jpg   (lowercase, spaces become -, .jpg)
+    // The photo appears on the info card automatically. If a picture is missing, the card simply shows no photo.
+    // To use a different file name, add  photo: "photos/my-picture.jpg"  to that place.
+    // TIP: keep each photo small (under 200 KB, about 800 px wide) so the page opens fast on a phone.
     const facilities = [
       { id: 1,  name: "Main Gate",                     type: "Entrance",       lat: 12.78283,           lng: 77.49911,          info: "Campus entrance" },
       { id: 2,  name: "Parking",                       type: "Utility",        lat: 12.78347,           lng: 77.49807,          info: "Vehicle parking area" },
@@ -498,11 +508,11 @@
       { id: 4,  name: "College of Engineering",        type: "Academic",       lat: 12.783684906752127, lng: 77.49654612477204, info: "Main engineering college building" },
       { id: 5,  name: "CSE/ISE Block (First Years)",   type: "Academic",       lat: 12.783598420679828, lng: 77.49635871637008, info: "CSE and ISE block for first year students" },
       { id: 6,  name: "APS Polytechnic Main Gate",     type: "Entrance",       lat: 12.786275867045564, lng: 77.50228133361014, info: "Main gate of APS Polytechnic" },
-      { id: 7,  name: "Administrative Block",          type: "Administration", lat: 12.78290,           lng: 77.49757,          info: "College administrative offices" },
-      { id: 8,  name: "Placement and Training Center", type: "Placement",      lat: 12.78378,           lng: 77.49693,          info: "Placement and training activities" },
+      { id: 7,  name: "Administrative Block",          type: "Administration", lat: 12.78290,           lng: 77.49757,          info: "College administrative offices", timings: "9:00 AM - 4:30 PM" },
+      { id: 8,  name: "Placement and Training Center", type: "Placement",      lat: 12.78378,           lng: 77.49693,          info: "Placement and training activities", timings: "9:00 AM - 5:00 PM" },
       { id: 9,  name: "Foundry and Forging Lab",       type: "Lab",            lat: 12.78393,           lng: 77.49859,          info: "Mechanical department lab" },
-      { id: 10, name: "APS Library",                   type: "Library",        lat: 12.782808732056443, lng: 77.4970212662975,  info: "Books and reading hall" },
-      { id: 11, name: "Canteen",                       type: "Food",           lat: 12.78269,           lng: 77.49715,          info: "Food and refreshments" },
+      { id: 10, name: "APS Library",                   type: "Library",        lat: 12.782808732056443, lng: 77.4970212662975,  info: "Books and reading hall", timings: "9:00 AM - 5:00 PM" },
+      { id: 11, name: "Canteen",                       type: "Food",           lat: 12.78269,           lng: 77.49715,          info: "Food and refreshments", timings: "8:00 AM - 5:00 PM" },
       { id: 12, name: "Boys Hostel",                   type: "Hostel",         lat: 12.78899439799923,  lng: 77.49774557731553, info: "Boys hostel" },
       { id: 13, name: "Girls Hostel",                  type: "Hostel",         lat: 12.78307,           lng: 77.49661,          info: "Girls hostel" },
       { id: 14, name: "Polytechnic Playground",        type: "Sports",         lat: 12.78707972413123,  lng: 77.49901800683597, info: "Playground and sports area" },
@@ -571,9 +581,15 @@
       });
     }
 
+    // Photos: uses f.photo if you set one, otherwise photos/<place-name>.jpg (see the PHOTOS note above the facilities list).
+    // The app first checks quietly whether the picture exists; the card only shows a photo when it does.
+    const photoOk = {};
+    function photoFor(f) { return f.photo || ('photos/' + slug(f.name) + '.jpg'); }
+
     function popupHTML(f) {
       const t = TYPE[f.type];
       return `
+        ${photoOk[f.id] ? `<img class="pop-photo" src="${photoFor(f)}" alt="${f.name}">` : ''}
         <div class="pop-head">
           <div class="pop-emoji">${t.emoji}</div>
           <div><div class="pop-name">${f.name}</div><span class="badge" style="--c:${t.color}">${f.type}</span></div>
@@ -621,6 +637,13 @@
       m.on('click', () => setActive(f.id));
       m.on('popupclose', () => { if (selectedId === f.id) setActive(null); });
       markers[f.id] = m;
+    });
+
+    // check which photos exist; for each one found, refresh that place's info card once
+    facilities.forEach(f => {
+      const im = new Image();
+      im.onload = () => { photoOk[f.id] = true; markers[f.id].setPopupContent(popupHTML(f)); };
+      im.src = photoFor(f);
     });
 
     // show name labels only when zoomed in
@@ -1081,7 +1104,8 @@
       if (live && currentSteps.length > 1) {
         const nx = currentSteps[1];
         html += `<div class="live-card"><div class="big">${nx.icon}</div><div><div class="t1">In ${fmtDist(currentSteps[0].dist)}: ${nx.text}</div><div class="t2">📡 Live · ${dist} left · ~${mins} min</div></div></div>`;
-        html += `<div class="dir-actions"><button class="btn" id="followBtn" onclick="recenter()">${follow ? '🎯 Following you' : '🎯 Recenter'}</button><button class="btn" onclick="stopTracking()">⏹ Stop</button></div>`;
+        html += `<div class="dir-actions"><button class="btn" id="followBtn" onclick="recenter()">${follow ? '🎯 Following you' : '🎯 Recenter'}</button>${canSpeak ? `<button class="btn" id="voiceBtn" onclick="toggleVoice()">${voiceOn ? '🔊 Voice: ON' : '🔇 Voice: OFF'}</button>` : ''}<button class="btn" onclick="stopTracking()">⏹ Stop</button></div>`;
+        voiceGuide(currentSteps);
       } else {
         html += `<div class="dir-stats"><span>🚶 ${dist}</span><span>⏱ ~${mins} min</span></div>`;
         html += `<div class="dir-actions"><button class="btn primary" onclick="startTracking()">📡 Start live tracking</button><button class="btn" onclick="startFly()">🎬 3D preview</button><button class="btn" onclick="shareRoute()">🔗 Share route</button></div>`;
@@ -1190,6 +1214,45 @@
     };
 
 
+    // ================= VOICE DIRECTIONS =================
+    // Reads the next turn out loud during live tracking. Uses the phone's built-in voice (no library needed).
+    let voiceOn = true, lastVoiceKey = '', voiceNowSaid = false;
+    try { voiceOn = localStorage.getItem('campusVoice') !== 'off'; } catch (e) {}
+    const canSpeak = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+
+    function speak(text) {
+      if (!canSpeak || !voiceOn) return;
+      try {
+        window.speechSynthesis.cancel();                       // never let old sentences pile up
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = 'en-IN'; u.rate = 0.95;
+        window.speechSynthesis.speak(u);
+      } catch (e) {}
+    }
+    function stopSpeaking() { if (canSpeak) { try { window.speechSynthesis.cancel(); } catch (e) {} } }
+    function lowerFirst(t) { return t.charAt(0).toLowerCase() + t.slice(1); }
+
+    // called on every live update with the route steps: step 0 = where you are now, step 1 = the next instruction
+    function voiceGuide(steps) {
+      if (!tracking || !voiceOn || steps.length < 2) return;
+      const nx = steps[1], d = steps[0].dist;
+      const key = nx.text + '|' + nx.at.lat.toFixed(6);
+      if (key !== lastVoiceKey) {                              // a new instruction became the next one
+        lastVoiceKey = key; voiceNowSaid = d <= 20;
+        speak(d > 20 ? 'In ' + fmtDist(d) + ', ' + lowerFirst(nx.text) : nx.text);
+      } else if (d <= 20 && !voiceNowSaid) {                   // you are almost there: say it once more
+        voiceNowSaid = true;
+        speak(nx.text);
+      }
+    }
+    function toggleVoice() {
+      voiceOn = !voiceOn;
+      try { localStorage.setItem('campusVoice', voiceOn ? 'on' : 'off'); } catch (e) {}
+      if (!voiceOn) stopSpeaking(); else speak('Voice directions on');
+      const b = document.getElementById('voiceBtn');
+      if (b) b.textContent = voiceOn ? '🔊 Voice: ON' : '🔇 Voice: OFF';
+    }
+
     // ================= LIVE TRACKING =================
     // Watches your GPS, moves the blue dot, re-plans the route from where you are and updates the next-turn card.
     // (Phones only give GPS to https:// pages, so this works on your GitHub link, not on a file opened from disk.)
@@ -1231,6 +1294,8 @@
       if (!dirTo.value) { dirResult.innerHTML = '<p class="dir-hint">Choose a destination (B) first, then start live tracking.</p>'; return; }
       if (watchId !== null) return;
       tracking = true; follow = true; lastTick = null;
+      lastVoiceKey = ''; voiceNowSaid = false;
+      speak('Live directions started');                        // this runs from your tap, so the phone allows the voice
       stepsOpen = window.innerWidth > 700;          // keep the phone panel small: steps stay folded while walking
       keepAwake(true);
       dirResult.innerHTML = '<p class="dir-hint">📡 Finding your location... allow location access if your browser asks.</p>';
@@ -1240,6 +1305,7 @@
     function stopTracking(keepUI) {
       if (watchId !== null) navigator.geolocation.clearWatch(watchId);
       watchId = null; tracking = false; lastTick = null;
+      stopSpeaking();
       keepAwake(false);
       if (!keepUI && dirBox.classList.contains('show')) updateDirections(false, true);
     }
@@ -1257,6 +1323,7 @@
       if (!dest) { stopTracking(true); return; }
       if (hav([lat, lng], [dest.lat, dest.lng]) <= ARRIVE_M) {
         stopTracking(true);
+        speak('You have arrived at ' + dest.name);
         lastRoute = null; currentSteps = []; routeLayer.clearLayers();
         dirResult.innerHTML = `<div class="live-card"><div class="big">🏁</div><div><div class="t1">You have arrived at ${dest.name}!</div><div class="t2">Live tracking stopped.</div></div></div>`;
         return;
@@ -1754,6 +1821,13 @@
     }
 
     // ================= START =================
+    // Admin mode (shows the Path tool): open the app with ?admin=1 once. Use ?admin=0 to switch it off again.
+    try {
+      const qa = new URLSearchParams(location.search).get('admin');
+      if (qa === '1') localStorage.setItem('campusAdmin', '1');
+      if (qa === '0') localStorage.removeItem('campusAdmin');
+      if (localStorage.getItem('campusAdmin') === '1') document.body.classList.add('admin');
+    } catch (e) {}
     document.getElementById('themeBtn').onclick = () => setTheme(document.body.dataset.theme === 'dark' ? 'light' : 'dark');
     buildChips();
     buildNearRow();
