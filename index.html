@@ -15,7 +15,7 @@
   </script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -57,7 +57,7 @@
 
     /* ---------- BASE ---------- */
     * { box-sizing: border-box; }
-    html, body { margin: 0; height: 100%; font-family: 'Poppins', system-ui, sans-serif; color: var(--text); }
+    html, body { margin: 0; height: 100%; font-family: 'Poppins', 'Noto Sans Kannada', system-ui, sans-serif; color: var(--text); }
     #mapWrap { position: fixed; inset: 0; z-index: 0; overflow: hidden; perspective: 1000px; background: var(--fog, #111); }
     #map { position: absolute; inset: 0; z-index: 0; background: #111; transform-origin: 50% 50%; transition: transform .9s ease; }
     /* 3D view: the map gets bigger than the screen (so no empty edges show), then tips back like a floor */
@@ -73,7 +73,7 @@
     #errbox {
       position: fixed; z-index: 5000; left: 50%; bottom: 16px; transform: translateX(-50%);
       background: #b91c1c; color: #fff; padding: 10px 16px; border-radius: 10px;
-      font: 600 13px 'Poppins', sans-serif; max-width: 90vw;
+      font: 600 13px 'Poppins', 'Noto Sans Kannada', sans-serif; max-width: 90vw;
     }
 
     .glass {
@@ -103,7 +103,7 @@
 
     #search {
       flex: none; width: 100%; padding: 11px 14px; border-radius: 12px; border: 1px solid var(--border);
-      background: var(--card); color: var(--text); font: 500 14px 'Poppins', sans-serif; outline: none;
+      background: var(--card); color: var(--text); font: 500 14px 'Poppins', 'Noto Sans Kannada', sans-serif; outline: none;
     }
     #search::placeholder { color: var(--muted); }
     #search:focus { border-color: var(--accent); box-shadow: var(--glow); }
@@ -111,7 +111,7 @@
     #chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0; flex: none; }
     .chip {
       border: 1px solid var(--border); background: var(--card); color: var(--text);
-      padding: 4px 10px; border-radius: 999px; font: 500 11.5px 'Poppins', sans-serif; cursor: pointer; transition: .2s;
+      padding: 4px 10px; border-radius: 999px; font: 500 11.5px 'Poppins', 'Noto Sans Kannada', sans-serif; cursor: pointer; transition: .2s;
     }
     .chip:hover { border-color: var(--accent); }
     .chip.active { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; border-color: transparent; }
@@ -139,7 +139,7 @@
     .sh-txt { display: none; }
     .btn {
       border: 1px solid var(--border); background: var(--card); color: var(--text);
-      padding: 7px 12px; border-radius: 10px; font: 500 12px 'Poppins', sans-serif; cursor: pointer; transition: .2s;
+      padding: 7px 12px; border-radius: 10px; font: 500 12px 'Poppins', 'Noto Sans Kannada', sans-serif; cursor: pointer; transition: .2s;
     }
     .btn:hover { border-color: var(--accent); box-shadow: var(--glow); }
 
@@ -198,13 +198,13 @@
 
     .lbl {
       opacity: 0 !important; transition: opacity .25s, scale .9s ease; background: var(--solid); color: var(--text);
-      border: 1px solid var(--border); border-radius: 8px; font: 600 11px 'Poppins', sans-serif; padding: 2px 8px; box-shadow: none;
+      border: 1px solid var(--border); border-radius: 8px; font: 600 11px 'Poppins', 'Noto Sans Kannada', sans-serif; padding: 2px 8px; box-shadow: none;
     }
     .labels .lbl { opacity: 1 !important; }
     .leaflet-tooltip-bottom.lbl::before { display: none; }
 
     .ptnum {
-      background: var(--accent); color: #000; border: none; font: 700 10px 'Poppins', sans-serif;
+      background: var(--accent); color: #000; border: none; font: 700 10px 'Poppins', 'Noto Sans Kannada', sans-serif;
       padding: 1px 6px; border-radius: 8px; box-shadow: none;
     }
     .leaflet-tooltip-top.ptnum::before { border-top-color: var(--accent); }
@@ -214,7 +214,7 @@
       background: var(--solid); color: var(--text); border: 1px solid var(--border); border-radius: 16px; box-shadow: var(--glow);
     }
     .glass-pop .leaflet-popup-tip { background: var(--solid); }
-    .glass-pop .leaflet-popup-content { margin: 14px 16px; font-family: 'Poppins', sans-serif; }
+    .glass-pop .leaflet-popup-content { margin: 14px 16px; font-family: 'Poppins', 'Noto Sans Kannada', sans-serif; }
     .pop-head { display: flex; align-items: center; gap: 12px; }
     .pop-emoji { font-size: 28px; }
     .pop-name { font-weight: 700; font-size: 14px; line-height: 1.2; }
@@ -226,7 +226,7 @@
     .pop-photo { display: block; width: 100%; height: 110px; object-fit: cover; border-radius: 10px; margin: 0 0 10px; background: var(--card); }
     .pop-time { margin: -4px 0 10px; font-size: 12px; font-weight: 600; color: var(--accent); }
     .dir {
-      width: 100%; padding: 8px; border: none; border-radius: 10px; font: 600 12px 'Poppins', sans-serif; color: #fff;
+      width: 100%; padding: 8px; border: none; border-radius: 10px; font: 600 12px 'Poppins', 'Noto Sans Kannada', sans-serif; color: #fff;
       background: linear-gradient(135deg, var(--accent), var(--accent2)); cursor: pointer; transition: .2s;
     }
     .dir:hover { box-shadow: var(--glow); transform: translateY(-1px); }
@@ -247,11 +247,11 @@
     .dir-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
     .dir-dot {
       flex: none; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center;
-      font: 700 11px 'Poppins', sans-serif; color: #fff; background: linear-gradient(135deg, var(--accent), var(--accent2));
+      font: 700 11px 'Poppins', 'Noto Sans Kannada', sans-serif; color: #fff; background: linear-gradient(135deg, var(--accent), var(--accent2));
     }
     #dirbox select {
       flex: 1; min-width: 0; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--border);
-      background: var(--solid); color: var(--text); font: 500 12.5px 'Poppins', sans-serif; outline: none;
+      background: var(--solid); color: var(--text); font: 500 12.5px 'Poppins', 'Noto Sans Kannada', sans-serif; outline: none;
     }
     #dirbox select:focus { border-color: var(--accent); }
     .dir-swap {
@@ -302,7 +302,7 @@
     .gpin.big { width: 34px; height: 34px; font-size: 17px; border-width: 2.5px; z-index: 2; }
     .gpin b {
       position: absolute; top: 100%; left: 50%; transform: translateX(-50%); margin-top: 5px; white-space: nowrap;
-      font: 600 11px 'Poppins', sans-serif; color: var(--text); background: var(--solid);
+      font: 600 11px 'Poppins', 'Noto Sans Kannada', sans-serif; color: var(--text); background: var(--solid);
       border: 1px solid var(--border); border-radius: 8px; padding: 2px 8px;
     }
 
@@ -316,7 +316,7 @@
     #flyHud .btn { padding: 6px 10px; }
     .fly-bar { flex: 1; height: 6px; border-radius: 6px; background: var(--card); border: 1px solid var(--border); overflow: hidden; }
     #flyFill { height: 100%; width: 0; background: linear-gradient(90deg, var(--accent), var(--accent2)); }
-    #flyTxt { font: 600 11.5px 'Poppins', sans-serif; color: var(--text); white-space: nowrap; }
+    #flyTxt { font: 600 11.5px 'Poppins', 'Noto Sans Kannada', sans-serif; color: var(--text); white-space: nowrap; }
     .walker { position: relative; width: 0; height: 0; }
     .walker .w-ring {
       position: absolute; left: -26px; top: -26px; width: 52px; height: 52px; border-radius: 50%;
@@ -336,7 +336,9 @@
 
     /* ---------- NEAREST TO ME ---------- */
     #nearRow { flex: none; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 10px 0 0; }
-    .near-lbl { flex: none; font: 600 11px 'Poppins', sans-serif; color: var(--muted); white-space: nowrap; }
+    .no-match { padding: 14px; text-align: center; color: var(--muted); font-size: 13px; }
+    #langBtn { font-weight: 600; }
+    .near-lbl { flex: none; font: 600 11px 'Poppins', 'Noto Sans Kannada', sans-serif; color: var(--muted); white-space: nowrap; }
     #nearRow .chip { white-space: nowrap; }
 
     /* ---------- SHARE / QR ---------- */
@@ -402,30 +404,31 @@
     <div class="brand">
       <div class="logo">🧭</div>
       <div>
-        <h1>Campus Navigator</h1>
-        <p>APS College of Engineering</p>
+        <h1 data-i18n="appName">Campus Navigator</h1>
+        <p data-i18n="college">APS College of Engineering</p>
       </div>
     </div>
-    <input id="search" type="text" placeholder="🔍  Search places...">
-    <div id="nearRow"><span class="near-lbl">📍 Nearest to me:</span></div>
+    <input id="search" type="text" placeholder="🔍  Search places..." data-i18n-ph="searchPh" enterkeyhint="search" autocomplete="off">
+    <div id="nearRow"><span class="near-lbl" data-i18n="nearLbl">📍 Nearest to me:</span></div>
     <div id="dirbox">
-      <div class="dir-head"><span>🧭 Directions</span><button class="dir-x" id="dirClose" title="Close">✕</button></div>
-      <div class="dir-row"><span class="dir-dot">A</span><select id="dirFrom"></select><button class="dir-swap" id="dirLocate" title="Use my location">📍</button></div>
-      <div class="dir-row"><span class="dir-dot">B</span><select id="dirTo"></select><button class="dir-swap" id="dirSwap" title="Swap start and destination">⇅</button></div>
+      <div class="dir-head"><span data-i18n="dirHead">🧭 Directions</span><button class="dir-x" id="dirClose" title="Close" data-i18n-title="close">✕</button></div>
+      <div class="dir-row"><span class="dir-dot">A</span><select id="dirFrom"></select><button class="dir-swap" id="dirLocate" title="Use my location" data-i18n-title="useMyLoc">📍</button></div>
+      <div class="dir-row"><span class="dir-dot">B</span><select id="dirTo"></select><button class="dir-swap" id="dirSwap" title="Swap start and destination" data-i18n-title="swapTip">⇅</button></div>
       <div id="dirResult"></div>
     </div>
     <div id="chips"></div>
     <div id="list"></div>
     <div class="panel-foot">
       <span id="count"></span>
-      <span><button class="btn" id="dirOpenBtn">🧭 Directions</button><button class="btn" id="fitBtn">Show all</button><button class="btn" id="shareBtn" title="Share this app">🔗<span class="sh-txt"> Share</span></button></span>
+      <span><button class="btn" id="dirOpenBtn" data-i18n="btnDirections">🧭 Directions</button><button class="btn" id="fitBtn" data-i18n="showAll">Show all</button><button class="btn" id="shareBtn" title="Share this app" data-i18n-title="shareTip">🔗<span class="sh-txt" data-i18n="shareTxt"> Share</span></button></span>
     </div>
   </aside>
 
   <!-- TOP RIGHT CONTROLS -->
   <div id="controls" class="glass">
     <button class="btn" id="toggle">☰</button>
-    <button class="btn" id="themeBtn" title="Switch between dark and bright"></button>
+    <button class="btn" id="themeBtn" title="Switch between dark and bright" data-i18n-title="themeTip"></button>
+    <button class="btn" id="langBtn" title="Switch language" data-i18n-title="langTip"></button>
     <div class="divider" id="toolDivider"></div>
     <button class="btn" id="toolBtn">📍 Path tool: OFF</button>
   </div>
@@ -447,10 +450,10 @@
 
   <!-- 3D FLY-THROUGH CONTROLS -->
   <div id="flyHud" class="glass">
-    <button class="btn" id="flyPause" title="Pause / play">⏸</button>
+    <button class="btn" id="flyPause" title="Pause / play" data-i18n-title="pauseTip">⏸</button>
     <div class="fly-bar"><div id="flyFill"></div></div>
-    <span id="flyTxt">🎬 3D preview</span>
-    <button class="btn" id="flyClose" title="Close the 3D preview">✕</button>
+    <span id="flyTxt" data-i18n="fly3d">🎬 3D preview</span>
+    <button class="btn" id="flyClose" title="Close the 3D preview" data-i18n-title="flyCloseTip">✕</button>
   </div>
 
   <!-- SHARE / QR POPUP -->
@@ -461,10 +464,10 @@
       <div id="qrBox"></div>
       <div id="shareUrl"></div>
       <div class="row">
-        <button class="btn" id="copyLinkBtn">Copy link</button>
-        <button class="btn" id="nativeShareBtn" style="display:none">Share...</button>
-        <button class="btn" id="dlQrBtn">Download QR</button>
-        <button class="btn" id="shareClose">Close</button>
+        <button class="btn" id="copyLinkBtn" data-i18n="copyLink">Copy link</button>
+        <button class="btn" id="nativeShareBtn" style="display:none" data-i18n="shareMore">Share...</button>
+        <button class="btn" id="dlQrBtn" data-i18n="dlQr">Download QR</button>
+        <button class="btn" id="shareClose" data-i18n="close">Close</button>
       </div>
     </div>
   </div>
@@ -524,6 +527,46 @@
       { id: 20, name: "APS Cricket Stadium",            type: "Sports",         lat: 12.7861194,         lng: 77.4981718,        info: "Cricket ground" }
     ];
 
+    // ================= KANNADA NAMES (for the ಕನ್ನಡ button) =================
+    // Each place id has its Kannada name and info. A place that is missing here simply shows in English.
+    // SEARCH_KEYS = extra English words people may type (for example "lib" finds the Library, "food" finds the Canteen).
+    const KN = {
+      1:  { name: "ಮುಖ್ಯ ದ್ವಾರ", info: "ಕ್ಯಾಂಪಸ್ ಪ್ರವೇಶದ್ವಾರ" },
+      2:  { name: "ಪಾರ್ಕಿಂಗ್", info: "ವಾಹನ ನಿಲುಗಡೆ ಪ್ರದೇಶ" },
+      3:  { name: "ಸಿಎಸ್ ಮತ್ತು ಸಿವಿಲ್ ಇಂಜಿನಿಯರಿಂಗ್ ಬ್ಲಾಕ್", info: "ಎ.ಪಿ.ಎಸ್ ಕಂಪ್ಯೂಟರ್ ಸೈನ್ಸ್ ಮತ್ತು ಸಿವಿಲ್ ಇಂಜಿನಿಯರಿಂಗ್ ಬ್ಲಾಕ್" },
+      4:  { name: "ಇಂಜಿನಿಯರಿಂಗ್ ಕಾಲೇಜು", info: "ಮುಖ್ಯ ಇಂಜಿನಿಯರಿಂಗ್ ಕಾಲೇಜು ಕಟ್ಟಡ" },
+      5:  { name: "ಸಿಎಸ್‌ಇ/ಐಎಸ್‌ಇ ಬ್ಲಾಕ್ (ಪ್ರಥಮ ವರ್ಷ)", info: "ಪ್ರಥಮ ವರ್ಷದ ವಿದ್ಯಾರ್ಥಿಗಳಿಗಾಗಿ ಸಿಎಸ್‌ಇ ಮತ್ತು ಐಎಸ್‌ಇ ಬ್ಲಾಕ್" },
+      6:  { name: "ಎಪಿಎಸ್ ಪಾಲಿಟೆಕ್ನಿಕ್ ಮುಖ್ಯ ದ್ವಾರ", info: "ಎಪಿಎಸ್ ಪಾಲಿಟೆಕ್ನಿಕ್‌ನ ಮುಖ್ಯ ದ್ವಾರ" },
+      7:  { name: "ಆಡಳಿತ ಬ್ಲಾಕ್", info: "ಕಾಲೇಜಿನ ಆಡಳಿತ ಕಚೇರಿಗಳು" },
+      8:  { name: "ಉದ್ಯೋಗ ಮತ್ತು ತರಬೇತಿ ಕೇಂದ್ರ", info: "ಉದ್ಯೋಗ ಮತ್ತು ತರಬೇತಿ ಚಟುವಟಿಕೆಗಳು" },
+      9:  { name: "ಫೌಂಡ್ರಿ ಮತ್ತು ಫೋರ್ಜಿಂಗ್ ಪ್ರಯೋಗಾಲಯ", info: "ಯಾಂತ್ರಿಕ ವಿಭಾಗದ ಪ್ರಯೋಗಾಲಯ" },
+      10: { name: "ಎಪಿಎಸ್ ಗ್ರಂಥಾಲಯ", info: "ಪುಸ್ತಕಗಳು ಮತ್ತು ಓದುವ ಕೊಠಡಿ" },
+      11: { name: "ಕ್ಯಾಂಟೀನ್", info: "ಆಹಾರ ಮತ್ತು ಪಾನೀಯಗಳು" },
+      12: { name: "ಬಾಲಕರ ವಸತಿ ನಿಲಯ", info: "ಬಾಲಕರ ವಸತಿ ನಿಲಯ" },
+      13: { name: "ಬಾಲಕಿಯರ ವಸತಿ ನಿಲಯ", info: "ಬಾಲಕಿಯರ ವಸತಿ ನಿಲಯ" },
+      14: { name: "ಪಾಲಿಟೆಕ್ನಿಕ್ ಆಟದ ಮೈದಾನ", info: "ಆಟದ ಮೈದಾನ ಮತ್ತು ಕ್ರೀಡಾ ಪ್ರದೇಶ" },
+      15: { name: "ಶ್ರೀ ಅನಂತಪದ್ಮನಾಭ ಸ್ವಾಮಿ ದೇವಸ್ಥಾನ", info: "ಕ್ಯಾಂಪಸ್ ಒಳಗಿನ ದೇವಸ್ಥಾನ" },
+      16: { name: "ಇಂಜಿನಿಯರಿಂಗ್ ಕಾಲೇಜು ಕ್ರೀಡಾ ಪ್ರದೇಶ", info: "ಇಂಜಿನಿಯರಿಂಗ್ ಕಾಲೇಜಿನ ಕ್ರೀಡಾ ಪ್ರದೇಶ" },
+      17: { name: "ಎಪಿಎಸ್ ಪಿಯು ಕಾಲೇಜು", info: "ಎಪಿಎಸ್ ಪದವಿ ಪೂರ್ವ ಕಾಲೇಜು" },
+      18: { name: "ಎಪಿಎಸ್ ಪಾಲಿಟೆಕ್ನಿಕ್", info: "ಎಪಿಎಸ್ ಪಾಲಿಟೆಕ್ನಿಕ್ ಕಾಲೇಜು" },
+      19: { name: "ಬಯಲು ರಂಗಮಂದಿರ", info: "ಕಾರ್ಯಕ್ರಮಗಳು ಮತ್ತು ಸಭೆಗಳಿಗಾಗಿ ಬಯಲು ರಂಗಮಂದಿರ" },
+      20: { name: "ಎಪಿಎಸ್ ಕ್ರಿಕೆಟ್ ಸ್ಟೇಡಿಯಂ", info: "ಕ್ರಿಕೆಟ್ ಮೈದಾನ" }
+    };
+    const TYPE_KN = {
+      "Entrance": "ಪ್ರವೇಶದ್ವಾರ", "Utility": "ಸೌಲಭ್ಯ", "Academic": "ಶೈಕ್ಷಣಿಕ", "Administration": "ಆಡಳಿತ",
+      "Placement": "ಉದ್ಯೋಗ", "Lab": "ಪ್ರಯೋಗಾಲಯ", "Library": "ಗ್ರಂಥಾಲಯ", "Food": "ಆಹಾರ", "Hostel": "ವಸತಿ ನಿಲಯ",
+      "Sports": "ಕ್ರೀಡೆ", "Temple": "ದೇವಸ್ಥಾನ", "Auditorium": "ರಂಗಮಂದಿರ"
+    };
+    const SEARCH_KEYS = {
+      1: "gate entrance", 2: "parking vehicle bike car", 3: "cs civil cse computer", 4: "college engineering",
+      5: "cse ise first year", 6: "poly gate entrance", 7: "admin office", 8: "placement training pt",
+      9: "foundry forging lab mech", 10: "lib library books reading", 11: "canteen food mess tea snacks cafe",
+      12: "boys hostel", 13: "girls hostel", 14: "playground ground", 15: "temple god mandir",
+      16: "sports ground", 17: "pu pre university", 18: "poly polytechnic", 19: "auditorium open stage",
+      20: "cricket stadium ground"
+    };
+    const NEAR_KN = { Canteen: "ಕ್ಯಾಂಟೀನ್", Hostel: "ವಸತಿ ನಿಲಯ", Library: "ಗ್ರಂಥಾಲಯ", Parking: "ಪಾರ್ಕಿಂಗ್", Gate: "ಗೇಟ್", Temple: "ದೇವಸ್ಥಾನ", Auditorium: "ರಂಗಮಂದಿರ" };
+
     // Building outlines for the 3D preview (estimated around each place pin: [lat, lng] corners, floors = height).
     // To fix one, change its pts or floors. Add "roof": "#ffcc00" to colour a roof.
     const BUILDINGS = [
@@ -542,6 +585,163 @@
       {"id": "b18", "name": "APS Polytechnic", "type": "Academic", "floors": 3, "pts": [[12.787525, 77.498548], [12.787678, 77.498601], [12.787828, 77.498147], [12.787675, 77.498094]]},
       {"id": "b19", "name": "Open Auditorium", "type": "Auditorium", "floors": 2, "pts": [[12.783141, 77.497393], [12.783215, 77.497266], [12.782998, 77.497134], [12.782925, 77.497261]]}
     ];
+
+    // ================= LANGUAGE: English / ಕನ್ನಡ =================
+    // LANG is 'en' or 'kn'. T('key') gives the text in the current language. The choice is remembered on the phone.
+    let LANG = 'en';
+    try { LANG = localStorage.getItem('campusLang') === 'kn' ? 'kn' : 'en'; } catch (e) {}
+
+    const I18N = {
+      en: {
+        appName: "Campus Navigator", college: "APS College of Engineering", docTitle: "Campus Navigator - APS College of Engineering",
+        searchPh: "🔍  Search places...", nearLbl: "📍 Nearest to me:", dirHead: "🧭 Directions", close: "Close",
+        useMyLoc: "Use my location", swapTip: "Swap start and destination", btnDirections: "🧭 Directions", showAll: "Show all",
+        shareTxt: " Share", shareTip: "Share this app", themeBright: "☀️ Bright", themeDark: "🌙 Dark",
+        themeTip: "Switch between dark and bright", langSwitch: "🌐 ಕನ್ನಡ", langTip: "Switch language",
+        places: "{n} places", noMatch: "No places found", all: "All",
+        chooseStart: "Choose starting point...", chooseDest: "Choose destination...", myLocOpt: "📍 My location",
+        pauseTip: "Pause / play", flyCloseTip: "Close the 3D preview", fly3d: "🎬 3D preview", arrivedHud: "🏁 Arrived",
+        shareTitle: "🔗 Share Campus Navigator", shareDesc: "Scan this QR code with a phone camera to open the app.",
+        copyLink: "Copy link", copied: "Copied!", shareMore: "Share...", dlQr: "Download QR",
+        sharePlaceDesc: "Scan to open {name} on the campus map.",
+        shareRouteTitle: "🔗 Share route", shareRouteDesc: "Scan to open walking directions from {from} to {to}.",
+        shareNavTitle: "🧭 Navigate to {to}", shareNavDesc: "Scan to get live walking directions to {to} from wherever you are standing.",
+        popShare: "🔗 Share", popShareTip: "Share this place (QR code)",
+        hintChoose: "Choose a starting point and a destination.", hintSame: "Please choose two different places.",
+        warnOffCampus: "⚠ Your location is about {m} m from the campus paths, so walking directions from here are not possible. Please choose a starting place instead.",
+        noRoute: "Sorry, no walking route found between these places.",
+        liveNext: "In {d}: {text}", liveInfo: "📡 Live · {dist} left · ~{mins} min",
+        following: "🎯 Following you", recenter: "🎯 Recenter", voiceOn: "🔊 Voice: ON", voiceOff: "🔇 Voice: OFF", stop: "⏹ Stop",
+        statMin: "⏱ ~{mins} min", startLive: "📡 Start live tracking", shareRouteBtn: "🔗 Share route",
+        warnDotted: "⚠ The dotted part is a straight line, because the walking path to {names} is not drawn yet.",
+        warnDottedMe: "⚠ The dotted part joins your location to the nearest campus path ({m} m away).",
+        and: " and ", stepsSum: "🧭 Step-by-step ({n} steps)",
+        locNoSupport: "⚠ Your browser does not support location.", locFinding: "📡 Finding your location...",
+        locGotChoose: "📍 Got your location. Now choose a destination (B).",
+        errDenied: "Location permission was denied. Allow location for this page in your browser, then tap 📍 again.",
+        errUnavailable: "Could not find your location. Make sure location/GPS is turned on.",
+        errTimeout: "Finding your location took too long. Please try again.",
+        httpsNote: "Note: location only works on https:// links or on localhost, not when the file is opened directly.",
+        youAreHere: "You are here", chooseDestFirst: "Choose a destination (B) first, then start live tracking.",
+        trackFinding: "📡 Finding your location... allow location access if your browser asks.",
+        arrivedT1: "You have arrived at {place}!", arrivedT2: "Live tracking stopped.",
+        trackDenied: "⚠ Location permission was denied. Allow location for this page in your browser, then try again.",
+        trackStill: "⚠ Still looking for your location. Make sure GPS/location is on (it works best outdoors).",
+        nearFar: "⚠ You are about {m} m from the campus paths, so I cannot find the nearest {what} by walking. Try again when you are on campus.",
+        nearNone: "⚠ No walking route found to a {what}.", nearBest: "⭐ Nearest {what}: <b>{name}</b>",
+        compass: "north|north-east|east|south-east|south|south-west|west|north-west",
+        stepHeadMe: "Head {dir}", stepStart: "Start at {place} and head {dir}",
+        stepAt: "{turn} at {place}", stepNear: "{turn} near {place}", stepPass: "Pass {place}", stepArrive: "Arrive at {place}",
+        walkDist: "Walk {d}", uturn: "Make a U-turn", sharpR: "Take a sharp right", sharpL: "Take a sharp left",
+        turnR: "Turn right", turnL: "Turn left", bearR: "Bear right", bearL: "Bear left",
+        voiceOnSay: "Voice directions on", liveStartSay: "Live directions started",
+        arrivedSay: "You have arrived at {place}", inDist: "In {d}, {text}"
+      },
+      kn: {
+        appName: "ಕ್ಯಾಂಪಸ್ ಮಾರ್ಗದರ್ಶಿ", college: "ಎಪಿಎಸ್ ಇಂಜಿನಿಯರಿಂಗ್ ಕಾಲೇಜು", docTitle: "ಕ್ಯಾಂಪಸ್ ಮಾರ್ಗದರ್ಶಿ - ಎಪಿಎಸ್ ಇಂಜಿನಿಯರಿಂಗ್ ಕಾಲೇಜು",
+        searchPh: "🔍  ಸ್ಥಳಗಳನ್ನು ಹುಡುಕಿ...", nearLbl: "📍 ನನ್ನ ಹತ್ತಿರದ:", dirHead: "🧭 ಮಾರ್ಗದರ್ಶನ", close: "ಮುಚ್ಚಿ",
+        useMyLoc: "ನನ್ನ ಸ್ಥಳ ಬಳಸಿ", swapTip: "ಆರಂಭ ಮತ್ತು ಗಮ್ಯಸ್ಥಾನ ಬದಲಿಸಿ", btnDirections: "🧭 ಮಾರ್ಗದರ್ಶನ", showAll: "ಎಲ್ಲವನ್ನೂ ತೋರಿಸಿ",
+        shareTxt: " ಹಂಚಿಕೊಳ್ಳಿ", shareTip: "ಈ ಆ್ಯಪ್ ಹಂಚಿಕೊಳ್ಳಿ", themeBright: "☀️ ಬೆಳಕು", themeDark: "🌙 ಕತ್ತಲೆ",
+        themeTip: "ಕತ್ತಲೆ ಮತ್ತು ಬೆಳಕಿನ ಮೋಡ್ ಬದಲಿಸಿ", langSwitch: "🌐 English", langTip: "ಭಾಷೆ ಬದಲಿಸಿ",
+        places: "{n} ಸ್ಥಳಗಳು", noMatch: "ಯಾವುದೇ ಸ್ಥಳ ಸಿಗಲಿಲ್ಲ", all: "ಎಲ್ಲಾ",
+        chooseStart: "ಆರಂಭದ ಸ್ಥಳ ಆಯ್ಕೆಮಾಡಿ...", chooseDest: "ಗಮ್ಯಸ್ಥಾನ ಆಯ್ಕೆಮಾಡಿ...", myLocOpt: "📍 ನನ್ನ ಸ್ಥಳ",
+        pauseTip: "ವಿರಾಮ / ಪ್ಲೇ", flyCloseTip: "3D ಪೂರ್ವವೀಕ್ಷಣೆ ಮುಚ್ಚಿ", fly3d: "🎬 3D ಪೂರ್ವವೀಕ್ಷಣೆ", arrivedHud: "🏁 ತಲುಪಿದ್ದೀರಿ",
+        shareTitle: "🔗 ಕ್ಯಾಂಪಸ್ ಮಾರ್ಗದರ್ಶಿ ಹಂಚಿಕೊಳ್ಳಿ", shareDesc: "ಆ್ಯಪ್ ತೆರೆಯಲು ಫೋನ್ ಕ್ಯಾಮೆರಾದಿಂದ ಈ QR ಕೋಡ್ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ.",
+        copyLink: "ಲಿಂಕ್ ನಕಲಿಸಿ", copied: "ನಕಲಾಯಿತು!", shareMore: "ಹಂಚಿಕೊಳ್ಳಿ...", dlQr: "QR ಡೌನ್‌ಲೋಡ್",
+        sharePlaceDesc: "ಕ್ಯಾಂಪಸ್ ನಕ್ಷೆಯಲ್ಲಿ {name} ತೆರೆಯಲು ಸ್ಕ್ಯಾನ್ ಮಾಡಿ.",
+        shareRouteTitle: "🔗 ಮಾರ್ಗ ಹಂಚಿಕೊಳ್ಳಿ", shareRouteDesc: "{from} ನಿಂದ {to} ವರೆಗಿನ ನಡಿಗೆ ಮಾರ್ಗ ತೆರೆಯಲು ಸ್ಕ್ಯಾನ್ ಮಾಡಿ.",
+        shareNavTitle: "🧭 {to} ಗೆ ಮಾರ್ಗದರ್ಶನ", shareNavDesc: "ನೀವು ಇರುವ ಸ್ಥಳದಿಂದ {to} ವರೆಗೆ ಲೈವ್ ನಡಿಗೆ ಮಾರ್ಗದರ್ಶನ ಪಡೆಯಲು ಸ್ಕ್ಯಾನ್ ಮಾಡಿ.",
+        popShare: "🔗 ಹಂಚಿಕೊಳ್ಳಿ", popShareTip: "ಈ ಸ್ಥಳ ಹಂಚಿಕೊಳ್ಳಿ (QR ಕೋಡ್)",
+        hintChoose: "ಆರಂಭದ ಸ್ಥಳ ಮತ್ತು ಗಮ್ಯಸ್ಥಾನ ಆಯ್ಕೆಮಾಡಿ.", hintSame: "ದಯವಿಟ್ಟು ಎರಡು ಬೇರೆ ಬೇರೆ ಸ್ಥಳಗಳನ್ನು ಆಯ್ಕೆಮಾಡಿ.",
+        warnOffCampus: "⚠ ನಿಮ್ಮ ಸ್ಥಳವು ಕ್ಯಾಂಪಸ್ ಮಾರ್ಗಗಳಿಂದ ಸುಮಾರು {m} ಮೀ ದೂರದಲ್ಲಿದೆ, ಆದ್ದರಿಂದ ಇಲ್ಲಿಂದ ನಡಿಗೆ ಮಾರ್ಗದರ್ಶನ ಸಾಧ್ಯವಿಲ್ಲ. ದಯವಿಟ್ಟು ಆರಂಭದ ಸ್ಥಳವನ್ನು ಆಯ್ಕೆಮಾಡಿ.",
+        noRoute: "ಕ್ಷಮಿಸಿ, ಈ ಸ್ಥಳಗಳ ನಡುವೆ ನಡಿಗೆ ಮಾರ್ಗ ಸಿಗಲಿಲ್ಲ.",
+        liveNext: "{d} ನಂತರ: {text}", liveInfo: "📡 ಲೈವ್ · {dist} ಬಾಕಿ · ~{mins} ನಿಮಿಷ",
+        following: "🎯 ನಿಮ್ಮನ್ನು ಅನುಸರಿಸುತ್ತಿದೆ", recenter: "🎯 ಮರುಕೇಂದ್ರೀಕರಿಸಿ", voiceOn: "🔊 ಧ್ವನಿ: ಆನ್", voiceOff: "🔇 ಧ್ವನಿ: ಆಫ್", stop: "⏹ ನಿಲ್ಲಿಸಿ",
+        statMin: "⏱ ~{mins} ನಿಮಿಷ", startLive: "📡 ಲೈವ್ ಟ್ರ್ಯಾಕಿಂಗ್ ಆರಂಭಿಸಿ", shareRouteBtn: "🔗 ಮಾರ್ಗ ಹಂಚಿಕೊಳ್ಳಿ",
+        warnDotted: "⚠ ಚುಕ್ಕಿ ರೇಖೆಯ ಭಾಗವು ನೇರ ಗೆರೆಯಾಗಿದೆ, ಏಕೆಂದರೆ {names} ಗೆ ನಡಿಗೆ ಮಾರ್ಗವನ್ನು ಇನ್ನೂ ಬರೆದಿಲ್ಲ.",
+        warnDottedMe: "⚠ ಚುಕ್ಕಿ ರೇಖೆಯ ಭಾಗವು ನಿಮ್ಮ ಸ್ಥಳವನ್ನು ಹತ್ತಿರದ ಕ್ಯಾಂಪಸ್ ಮಾರ್ಗಕ್ಕೆ ಜೋಡಿಸುತ್ತದೆ ({m} ಮೀ ದೂರ).",
+        and: " ಮತ್ತು ", stepsSum: "🧭 ಹಂತ ಹಂತವಾಗಿ ({n} ಹಂತಗಳು)",
+        locNoSupport: "⚠ ನಿಮ್ಮ ಬ್ರೌಸರ್ ಸ್ಥಳ ಸೇವೆಯನ್ನು ಬೆಂಬಲಿಸುವುದಿಲ್ಲ.", locFinding: "📡 ನಿಮ್ಮ ಸ್ಥಳವನ್ನು ಹುಡುಕಲಾಗುತ್ತಿದೆ...",
+        locGotChoose: "📍 ನಿಮ್ಮ ಸ್ಥಳ ಸಿಕ್ಕಿದೆ. ಈಗ ಗಮ್ಯಸ್ಥಾನ (B) ಆಯ್ಕೆಮಾಡಿ.",
+        errDenied: "ಸ್ಥಳದ ಅನುಮತಿ ನಿರಾಕರಿಸಲಾಗಿದೆ. ನಿಮ್ಮ ಬ್ರೌಸರ್‌ನಲ್ಲಿ ಈ ಪುಟಕ್ಕೆ ಸ್ಥಳ ಅನುಮತಿ ನೀಡಿ, ನಂತರ ಮತ್ತೆ 📍 ಒತ್ತಿ.",
+        errUnavailable: "ನಿಮ್ಮ ಸ್ಥಳ ಸಿಗಲಿಲ್ಲ. ಲೊಕೇಶನ್/GPS ಆನ್ ಇದೆಯೇ ಎಂದು ಪರಿಶೀಲಿಸಿ.",
+        errTimeout: "ನಿಮ್ಮ ಸ್ಥಳ ಹುಡುಕಲು ಹೆಚ್ಚು ಸಮಯ ತೆಗೆದುಕೊಂಡಿತು. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+        httpsNote: "ಸೂಚನೆ: ಸ್ಥಳ ಸೇವೆ https:// ಲಿಂಕ್‌ಗಳಲ್ಲಿ ಅಥವಾ localhost ನಲ್ಲಿ ಮಾತ್ರ ಕೆಲಸ ಮಾಡುತ್ತದೆ, ಫೈಲ್ ನೇರವಾಗಿ ತೆರೆದಾಗ ಅಲ್ಲ.",
+        youAreHere: "ನೀವು ಇಲ್ಲಿದ್ದೀರಿ", chooseDestFirst: "ಮೊದಲು ಗಮ್ಯಸ್ಥಾನ (B) ಆಯ್ಕೆಮಾಡಿ, ನಂತರ ಲೈವ್ ಟ್ರ್ಯಾಕಿಂಗ್ ಆರಂಭಿಸಿ.",
+        trackFinding: "📡 ನಿಮ್ಮ ಸ್ಥಳವನ್ನು ಹುಡುಕಲಾಗುತ್ತಿದೆ... ಬ್ರೌಸರ್ ಕೇಳಿದರೆ ಸ್ಥಳ ಪ್ರವೇಶಕ್ಕೆ ಅನುಮತಿ ನೀಡಿ.",
+        arrivedT1: "ನೀವು {place} ತಲುಪಿದ್ದೀರಿ!", arrivedT2: "ಲೈವ್ ಟ್ರ್ಯಾಕಿಂಗ್ ನಿಲ್ಲಿಸಲಾಗಿದೆ.",
+        trackDenied: "⚠ ಸ್ಥಳದ ಅನುಮತಿ ನಿರಾಕರಿಸಲಾಗಿದೆ. ನಿಮ್ಮ ಬ್ರೌಸರ್‌ನಲ್ಲಿ ಈ ಪುಟಕ್ಕೆ ಸ್ಥಳ ಅನುಮತಿ ನೀಡಿ, ನಂತರ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+        trackStill: "⚠ ಇನ್ನೂ ನಿಮ್ಮ ಸ್ಥಳ ಹುಡುಕುತ್ತಿದೆ. GPS/ಲೊಕೇಶನ್ ಆನ್ ಇದೆಯೇ ಎಂದು ನೋಡಿ (ಹೊರಾಂಗಣದಲ್ಲಿ ಉತ್ತಮವಾಗಿ ಕೆಲಸ ಮಾಡುತ್ತದೆ).",
+        nearFar: "⚠ ನೀವು ಕ್ಯಾಂಪಸ್ ಮಾರ್ಗಗಳಿಂದ ಸುಮಾರು {m} ಮೀ ದೂರದಲ್ಲಿದ್ದೀರಿ, ಆದ್ದರಿಂದ ಹತ್ತಿರದ {what} ಹುಡುಕಲು ಸಾಧ್ಯವಿಲ್ಲ. ಕ್ಯಾಂಪಸ್‌ನಲ್ಲಿರುವಾಗ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+        nearNone: "⚠ {what} ಗೆ ನಡಿಗೆ ಮಾರ್ಗ ಸಿಗಲಿಲ್ಲ.", nearBest: "⭐ ಹತ್ತಿರದ {what}: <b>{name}</b>",
+        compass: "ಉತ್ತರ|ಈಶಾನ್ಯ|ಪೂರ್ವ|ಆಗ್ನೇಯ|ದಕ್ಷಿಣ|ನೈಋತ್ಯ|ಪಶ್ಚಿಮ|ವಾಯವ್ಯ",
+        stepHeadMe: "{dir} ದಿಕ್ಕಿನಲ್ಲಿ ನಡೆಯಿರಿ", stepStart: "ಪ್ರಾರಂಭ: {place} — {dir} ದಿಕ್ಕಿನಲ್ಲಿ ನಡೆಯಿರಿ",
+        stepAt: "{place} ಬಳಿ {turn}", stepNear: "{place} ಬಳಿ {turn}", stepPass: "{place} ಹಾದು ಹೋಗಿ", stepArrive: "{place} ತಲುಪಿದ್ದೀರಿ",
+        walkDist: "{d} ನಡೆಯಿರಿ", uturn: "ಯು-ಟರ್ನ್ ಮಾಡಿ", sharpR: "ತೀವ್ರವಾಗಿ ಬಲಕ್ಕೆ ತಿರುಗಿ", sharpL: "ತೀವ್ರವಾಗಿ ಎಡಕ್ಕೆ ತಿರುಗಿ",
+        turnR: "ಬಲಕ್ಕೆ ತಿರುಗಿ", turnL: "ಎಡಕ್ಕೆ ತಿರುಗಿ", bearR: "ಸ್ವಲ್ಪ ಬಲಕ್ಕೆ ತಿರುಗಿ", bearL: "ಸ್ವಲ್ಪ ಎಡಕ್ಕೆ ತಿರುಗಿ",
+        voiceOnSay: "ಧ್ವನಿ ಮಾರ್ಗದರ್ಶನ ಆನ್ ಆಗಿದೆ", liveStartSay: "ಲೈವ್ ಮಾರ್ಗದರ್ಶನ ಆರಂಭವಾಗಿದೆ",
+        arrivedSay: "ನೀವು {place} ತಲುಪಿದ್ದೀರಿ", inDist: "{d} ನಂತರ, {text}"
+      }
+    };
+    function TL(L, key, v) {
+      let str = (I18N[L] && I18N[L][key] !== undefined) ? I18N[L][key] : (I18N.en[key] !== undefined ? I18N.en[key] : key);
+      if (v) str = str.replace(/\{(\w+)\}/g, (m, k) => (v[k] !== undefined ? v[k] : m));
+      return str;
+    }
+    function T(key, v) { return TL(LANG, key, v); }
+
+    // place text in the chosen language (falls back to English if a Kannada name is missing)
+    function pname(f, L) { L = L || LANG; return (L === 'kn' && KN[f.id] && KN[f.id].name) || f.name; }
+    function pinfo(f, L) { L = L || LANG; return (L === 'kn' && KN[f.id] && KN[f.id].info) || f.info; }
+    function ptype(type, L) { L = L || LANG; return (L === 'kn' && TYPE_KN[type]) || type; }
+    function ptime(f, L) {
+      L = L || LANG;
+      if (L !== 'kn' || !f.timings) return f.timings;
+      const m = f.timings.match(/^\s*(\d{1,2}:\d{2})\s*(AM|PM)\s*-\s*(\d{1,2}:\d{2})\s*(AM|PM)\s*$/i);
+      if (!m) return f.timings;
+      const part = (tm, ap) => {
+        if (ap.toUpperCase() === 'AM') return 'ಬೆಳಿಗ್ಗೆ';
+        const h = parseInt(tm, 10);
+        return (h === 12 || h < 4) ? 'ಮಧ್ಯಾಹ್ನ' : 'ಸಂಜೆ';
+      };
+      return part(m[1], m[2]) + ' ' + m[1] + ' ರಿಂದ ' + part(m[3], m[4]) + ' ' + m[3] + ' ರವರೆಗೆ';
+    }
+    function nearLabel(o) { return LANG === 'kn' ? (NEAR_KN[o.label] || o.label) : o.label; }
+    function nearWhat(o) { return LANG === 'kn' ? nearLabel(o) : o.label.toLowerCase(); }
+
+    function applyStaticLang() {
+      document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = T(el.dataset.i18n); });
+      document.querySelectorAll('[data-i18n-ph]').forEach(el => { el.placeholder = T(el.dataset.i18nPh); });
+      document.querySelectorAll('[data-i18n-title]').forEach(el => { el.title = T(el.dataset.i18nTitle); });
+    }
+    function updateThemeBtn(name) {
+      document.getElementById('themeBtn').textContent = name === 'dark' ? T('themeBright') : T('themeDark');
+    }
+    function updateLangBtn() { document.getElementById('langBtn').textContent = T('langSwitch'); }
+
+    // switch the whole app between English and ಕನ್ನಡ
+    function setLang(L) {
+      LANG = (L === 'kn') ? 'kn' : 'en';
+      try { localStorage.setItem('campusLang', LANG); } catch (e) {}
+      document.documentElement.lang = LANG;
+      document.title = T('docTitle');
+      applyStaticLang();
+      updateLangBtn();
+      updateThemeBtn(document.body.dataset.theme);
+      buildChips();
+      buildNearRow();
+      rebuildDirSelects();
+      applyFilter();
+      facilities.forEach(f => {
+        markers[f.id].setPopupContent(popupHTML(f));
+        markers[f.id].setTooltipContent(pname(f));
+      });
+      if (meDot) meDot.setTooltipContent(T('youAreHere'));
+      updateFollowBtn();
+      lastVoiceKey = '';
+      if (flyOn) document.getElementById('flyTxt').textContent = flyDone ? T('arrivedHud') : T('fly3d');
+      if (dirBox.classList.contains('show') && !flyOn && (lastRoute || !dirTo.value)) updateDirections(tracking, true);
+    }
 
     // ================= MAP + THEMES =================
     const map = L.map('map', { zoomControl: false, maxZoom: 19 }).setView([12.783545, 77.498696], 17);
@@ -562,7 +762,7 @@
       document.body.dataset.theme = name;
       if (currentTile) map.removeLayer(currentTile);
       currentTile = TILES[name].addTo(map);
-      document.getElementById('themeBtn').textContent = name === 'dark' ? '☀️ Bright' : '🌙 Dark';
+      updateThemeBtn(name);
       try { localStorage.setItem('campusTheme', name); } catch (e) {}
       redrawPoints();
       redrawRoute();
@@ -589,16 +789,16 @@
     function popupHTML(f) {
       const t = TYPE[f.type];
       return `
-        ${photoOk[f.id] ? `<img class="pop-photo" src="${photoFor(f)}" alt="${f.name}">` : ''}
+        ${photoOk[f.id] ? `<img class="pop-photo" src="${photoFor(f)}" alt="${pname(f)}">` : ''}
         <div class="pop-head">
           <div class="pop-emoji">${t.emoji}</div>
-          <div><div class="pop-name">${f.name}</div><span class="badge" style="--c:${t.color}">${f.type}</span></div>
+          <div><div class="pop-name">${pname(f)}</div><span class="badge" style="--c:${t.color}">${ptype(f.type)}</span></div>
         </div>
-        <p class="pop-info">${f.info}</p>
-        ${f.timings ? `<p class="pop-time">🕒 ${f.timings}</p>` : ''}
+        <p class="pop-info">${pinfo(f)}</p>
+        ${f.timings ? `<p class="pop-time">🕒 ${ptime(f)}</p>` : ''}
         <div class="pop-btns">
-          <button class="dir" onclick="startDirections(${f.id})">🧭 Directions</button>
-          <button class="dir alt" onclick="sharePlace(${f.id})" title="Share this place (QR code)">🔗 Share</button>
+          <button class="dir" onclick="startDirections(${f.id})">${T('btnDirections')}</button>
+          <button class="dir alt" onclick="sharePlace(${f.id})" title="${T('popShareTip')}">${T('popShare')}</button>
         </div>`;
     }
 
@@ -633,7 +833,7 @@
     facilities.forEach(f => {
       const m = L.marker([f.lat, f.lng], { icon: pinIcon(f) }).addTo(map);
       m.bindPopup(popupHTML(f), { className: 'glass-pop', closeButton: false, minWidth: 200, maxWidth: 260 });
-      m.bindTooltip(f.name, { permanent: true, direction: 'bottom', offset: [0, 18], className: 'lbl', opacity: 1 });
+      m.bindTooltip(pname(f), { permanent: true, direction: 'bottom', offset: [0, 18], className: 'lbl', opacity: 1 });
       m.on('click', () => setActive(f.id));
       m.on('popupclose', () => { if (selectedId === f.id) setActive(null); });
       markers[f.id] = m;
@@ -675,26 +875,49 @@
       if (window.innerWidth <= 700) document.getElementById('panel').classList.add('hidden');
     }
 
-    function applyFilter() {
+    // How well a place matches what was typed (smaller = better, -1 = no match).
+    // It checks the English name, the Kannada name, the type and the extra words in SEARCH_KEYS.
+    function matchScore(f, text) {
+      if (!text) return 0;
+      const n = f.name.toLowerCase();
+      const kn = (KN[f.id] && KN[f.id].name) || '';
+      const keys = (SEARCH_KEYS[f.id] || '').toLowerCase();
+      if (n.startsWith(text) || n.split(/[^a-z0-9]+/).some(w => w.startsWith(text))) return 1;
+      if (n.includes(text) || kn.includes(text)) return 2;
+      if (f.type.toLowerCase().includes(text) || (TYPE_KN[f.type] || '').includes(text)) return 3;
+      if (keys.includes(text)) return 4;
+      return -1;
+    }
+
+    function currentItems() {
       const text = searchBox.value.toLowerCase().trim();
-      const items = facilities.filter(f =>
-        (activeType === 'All' || f.type === activeType) &&
-        (f.name.toLowerCase().includes(text) || f.type.toLowerCase().includes(text))
-      );
+      const hits = [];
+      facilities.forEach(f => {
+        if (activeType !== 'All' && f.type !== activeType) return;
+        const sc = matchScore(f, text);
+        if (sc >= 0) hits.push({ f, sc });
+      });
+      if (text) hits.sort((a, b) => a.sc - b.sc);      // best match first
+      return hits.map(h => h.f);
+    }
+
+    function applyFilter() {
+      const items = currentItems();
 
       // list
       listDiv.innerHTML = '';
       items.forEach(f => {
-        const t = TYPE[f.type];
+        const ty = TYPE[f.type];
         const div = document.createElement('div');
         div.className = 'card' + (f.id === selectedId ? ' active' : '');
         div.dataset.id = f.id;
         div.innerHTML = `
-          <div class="ico" style="--c:${t.color}">${t.emoji}</div>
-          <div><div class="name">${f.name}</div><div class="type">${f.type}</div></div>`;
+          <div class="ico" style="--c:${ty.color}">${ty.emoji}</div>
+          <div><div class="name">${pname(f)}</div><div class="type">${ptype(f.type)}</div></div>`;
         div.onclick = () => selectFacility(f);
         listDiv.appendChild(div);
       });
+      if (!items.length) listDiv.innerHTML = `<div class="no-match">${T('noMatch')}</div>`;
 
       // markers
       const ids = new Set(items.map(f => f.id));
@@ -703,19 +926,20 @@
         else map.removeLayer(markers[f.id]);
       });
 
-      document.getElementById('count').textContent = items.length + ' places';
+      document.getElementById('count').textContent = T('places', { n: items.length });
       declutter();
     }
 
     function buildChips() {
+      chipsDiv.innerHTML = '';
       const types = ['All', ...new Set(facilities.map(f => f.type))];
-      types.forEach(t => {
+      types.forEach(ty => {
         const b = document.createElement('button');
-        b.className = 'chip' + (t === 'All' ? ' active' : '');
-        b.textContent = (t === 'All' ? '✨ ' : TYPE[t].emoji + ' ') + t;
+        b.className = 'chip' + (ty === activeType ? ' active' : '');
+        b.textContent = (ty === 'All' ? '✨ ' + T('all') : TYPE[ty].emoji + ' ' + ptype(ty));
         b.onclick = () => {
-          activeType = t;
-          document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+          activeType = ty;
+          chipsDiv.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
           b.classList.add('active');
           applyFilter();
         };
@@ -723,7 +947,32 @@
       });
     }
 
-    searchBox.addEventListener('input', applyFilter);
+    // ---- search bar: type a few letters (like "lib") and the map jumps to that place ----
+    let searchTimer = 0;
+    function jumpToPlace(f) {
+      clearTimeout(searchTimer);
+      searchBox.value = '';          // clear the box so all pins come back
+      applyFilter();
+      searchBox.blur();
+      selectFacility(f);             // flies to the place and opens its info card
+    }
+    searchBox.addEventListener('input', () => {
+      applyFilter();                                   // the list and pins narrow down as you type
+      clearTimeout(searchTimer);
+      const text = searchBox.value.trim();
+      if (Array.from(text).length >= 3) {              // 3+ letters and only ONE place matches: jump there by itself
+        searchTimer = setTimeout(() => {
+          const items = currentItems();
+          if (items.length === 1 && searchBox.value.trim() === text) jumpToPlace(items[0]);
+        }, 700);
+      }
+    });
+    searchBox.addEventListener('keydown', e => {       // Enter (or "Go" on the phone keyboard) jumps to the best match
+      if (e.key !== 'Enter') return;
+      e.preventDefault();
+      const items = currentItems();
+      if (items.length && searchBox.value.trim()) jumpToPlace(items[0]);
+    });
     document.getElementById('fitBtn').onclick = fitAll;
     document.getElementById('toggle').onclick = () => document.getElementById('panel').classList.toggle('hidden');
 
@@ -941,11 +1190,17 @@
 
     function buildDirSelects() {
       [dirFrom, dirTo].forEach((sel, i) => {
-        sel.innerHTML = `<option value="">${i === 0 ? 'Choose starting point...' : 'Choose destination...'}</option>` +
-          facilities.map(f => `<option value="${f.id}">${TYPE[f.type].emoji} ${f.name}</option>`).join('');
+        sel.innerHTML = `<option value="">${i === 0 ? T('chooseStart') : T('chooseDest')}</option>` +
+          facilities.map(f => `<option value="${f.id}">${TYPE[f.type].emoji} ${pname(f)}</option>`).join('');
       });
     }
     buildDirSelects();
+    function rebuildDirSelects() {          // used when the language changes: keeps what was chosen
+      const keep = [dirFrom.value, dirTo.value], hadMe = meOptionAdded;
+      buildDirSelects();
+      if (hadMe) { meOptionAdded = false; ensureMeOption(); }
+      dirFrom.value = keep[0]; dirTo.value = keep[1];
+    }
 
     function drawRoute() {
       routeLayer.clearLayers();
@@ -981,12 +1236,13 @@
       const x = Math.cos(a[0] * rad) * Math.sin(b[0] * rad) - Math.sin(a[0] * rad) * Math.cos(b[0] * rad) * Math.cos(dL);
       return (Math.atan2(y, x) / rad + 360) % 360;
     }
-    function compass(b) { return ['north', 'north-east', 'east', 'south-east', 'south', 'south-west', 'west', 'north-west'][Math.round(b / 45) % 8]; }
-    function fmtDist(m) {
+    function compass(b, L) { return TL(L || LANG, 'compass').split('|')[Math.round(b / 45) % 8]; }
+    function unitTxt(u, L) { return (L || LANG) === 'kn' ? (u === 'km' ? 'ಕಿಮೀ' : 'ಮೀ') : u; }
+    function fmtDist(m, L) {
       const r = m >= 30 ? Math.round(m / 5) * 5 : Math.max(1, Math.round(m));
-      return r >= 1000 ? (r / 1000).toFixed(2) + ' km' : r + ' m';
+      return r >= 1000 ? (r / 1000).toFixed(2) + ' ' + unitTxt('km', L) : r + ' ' + unitTxt('m', L);
     }
-    function placeName(id) { const f = facilities.find(x => x.id === id); return f ? f.name : ''; }
+    function placeName(id, L) { const f = facilities.find(x => x.id === id); return f ? pname(f, L) : ''; }
     function nearbyPlace(p, skip) {
       let best = null, bd = 25;
       facilities.forEach(f => {
@@ -996,16 +1252,18 @@
       });
       return best;
     }
-    function turnInfo(diff) {
-      const a = Math.abs(diff), side = diff > 0 ? 'right' : 'left';
-      if (a >= 155) return { icon: '↩️', text: 'Make a U-turn' };
-      if (a >= 125) return { icon: diff > 0 ? '↘️' : '↙️', text: 'Take a sharp ' + side };
-      if (a >= 60)  return { icon: diff > 0 ? '➡️' : '⬅️', text: 'Turn ' + side };
-      return { icon: diff > 0 ? '↗️' : '↖️', text: 'Bear ' + side };
+    function turnInfo(diff, L) {
+      const a = Math.abs(diff), R = diff > 0;
+      if (a >= 155) return { icon: '↩️', text: TL(L, 'uturn') };
+      if (a >= 125) return { icon: R ? '↘️' : '↙️', text: TL(L, R ? 'sharpR' : 'sharpL') };
+      if (a >= 60)  return { icon: R ? '➡️' : '⬅️', text: TL(L, R ? 'turnR' : 'turnL') };
+      return { icon: R ? '↗️' : '↖️', text: TL(L, R ? 'bearR' : 'bearL') };
     }
 
     // turns a route (list of graph nodes) into a list of steps: start, turns / landmarks, arrive
-    function buildSteps(r, fromKey, toId) {
+    // L = language of the sentences ('en' or 'kn')
+    function buildSteps(r, fromKey, toId, L) {
+      L = L || LANG;
       const P = [];
       r.nodes.forEach((ni, k) => {
         const nd = G.nodes[ni];
@@ -1030,8 +1288,8 @@
           if (back && Math.min(hav(A, B), hav(B, C)) < 15) { P.splice(i, 1); again = true; break; }
         }
       }
-      const destName = placeName(toId);
-      if (P.length < 2) return [{ icon: '🏁', text: 'Arrive at ' + destName, at: P[0], cum: 0, dist: 0 }];
+      const destName = placeName(toId, L);
+      if (P.length < 2) return [{ icon: '🏁', text: TL(L, 'stepArrive', { place: destName }), at: P[0], cum: 0, dist: 0 }];
 
       const seg = [], cum = [0];
       for (let i = 1; i < P.length; i++) {
@@ -1043,30 +1301,34 @@
       const steps = [];
       steps.push({
         icon: '🚶', at: P[0], cum: 0,
-        text: fromKey === 'me' ? 'Head ' + compass(seg[0].b) : 'Start at ' + placeName(fromKey) + ' and head ' + compass(seg[0].b)
+        text: fromKey === 'me'
+          ? TL(L, 'stepHeadMe', { dir: compass(seg[0].b, L) })
+          : TL(L, 'stepStart', { place: placeName(fromKey, L), dir: compass(seg[0].b, L) })
       });
       let ref = seg[0].b;
       for (let i = 1; i < P.length - 1; i++) {
         const nb = seg[i].b;
         const diff = ((nb - ref + 540) % 360) - 180;          // -180..180, positive = right
         const here = P[i];
-        const near = here.fid ? { name: placeName(here.fid), at: true } : (nearbyPlace(here, skip) ? { name: nearbyPlace(here, skip).name, at: false } : null);
+        const nbp = here.fid ? null : nearbyPlace(here, skip);
+        const near = here.fid ? { name: placeName(here.fid, L), at: true } : (nbp ? { name: pname(nbp, L), at: false } : null);
         if (Math.abs(diff) >= TURN_MIN) {
-          const m = turnInfo(diff);
-          steps.push({ icon: m.icon, at: here, cum: cum[i], text: m.text + (near ? (near.at ? ' at ' : ' near ') + near.name : '') });
+          const m = turnInfo(diff, L);
+          steps.push({ icon: m.icon, at: here, cum: cum[i],
+            text: near ? TL(L, near.at ? 'stepAt' : 'stepNear', { turn: m.text, place: near.name }) : m.text });
           ref = nb;
         } else if (here.fid) {
-          steps.push({ icon: '📍', at: here, cum: cum[i], text: 'Pass ' + placeName(here.fid) });
+          steps.push({ icon: '📍', at: here, cum: cum[i], text: TL(L, 'stepPass', { place: placeName(here.fid, L) }) });
         }
       }
-      steps.push({ icon: '🏁', at: P[P.length - 1], cum: cum[P.length - 1], text: 'Arrive at ' + destName });
+      steps.push({ icon: '🏁', at: P[P.length - 1], cum: cum[P.length - 1], text: TL(L, 'stepArrive', { place: destName }) });
       steps.forEach((st, i) => { st.dist = i < steps.length - 1 ? steps[i + 1].cum - st.cum : 0; });
       return steps;
     }
 
     function stepsHTML(steps, nowIdx) {
       return '<ol class="steps">' + steps.map((s, i) =>
-        `<li class="step${i === nowIdx ? ' now' : ''}" onclick="focusStep(${i})"><span class="si">${s.icon}</span><div><div class="st">${s.text}</div>${s.dist ? `<div class="sd">Walk ${fmtDist(s.dist)}</div>` : ''}</div></li>`
+        `<li class="step${i === nowIdx ? ' now' : ''}" onclick="focusStep(${i})"><span class="si">${s.icon}</span><div><div class="st">${s.text}</div>${s.dist ? `<div class="sd">${T('walkDist', { d: fmtDist(s.dist) })}</div>` : ''}</div></li>`
       ).join('') + '</ol>';
     }
     function focusStep(i) {
@@ -1085,39 +1347,39 @@
       currentSteps = [];
       routeLayer.clearLayers();
       const a = dirFrom.value === 'me' ? 'me' : Number(dirFrom.value), b = Number(dirTo.value);
-      if (!a || !b) { dirResult.innerHTML = '<p class="dir-hint">Choose a starting point and a destination.</p>'; return; }
-      if (a === b) { dirResult.innerHTML = '<p class="dir-hint">Please choose two different places.</p>'; return; }
+      if (!a || !b) { dirResult.innerHTML = `<p class="dir-hint">${T('hintChoose')}</p>`; return; }
+      if (a === b) { dirResult.innerHTML = `<p class="dir-hint">${T('hintSame')}</p>`; return; }
       if (a === 'me' && myGap > OFF_CAMPUS) {
-        dirResult.innerHTML = `<p class="dir-warn">⚠ Your location is about ${Math.round(myGap)} m from the campus paths, so walking directions from here are not possible. Please choose a starting place instead.</p>`;
+        dirResult.innerHTML = `<p class="dir-warn">${T('warnOffCampus', { m: Math.round(myGap) })}</p>`;
         return;
       }
       const r = shortestPath(a, b);
-      if (!r) { dirResult.innerHTML = '<p class="dir-hint">Sorry, no walking route found between these places.</p>'; return; }
+      if (!r) { dirResult.innerHTML = `<p class="dir-hint">${T('noRoute')}</p>`; return; }
       lastRoute = r;
       drawRoute();
       currentSteps = buildSteps(r, a, b);
       const meters = Math.round(r.dist);
       const mins = Math.max(1, Math.round(r.dist / WALK_M_PER_MIN));
-      const dist = meters >= 1000 ? (meters / 1000).toFixed(2) + ' km' : meters + ' m';
+      const dist = meters >= 1000 ? (meters / 1000).toFixed(2) + ' ' + unitTxt('km') : meters + ' ' + unitTxt('m');
 
       let html = '';
       if (live && currentSteps.length > 1) {
         const nx = currentSteps[1];
-        html += `<div class="live-card"><div class="big">${nx.icon}</div><div><div class="t1">In ${fmtDist(currentSteps[0].dist)}: ${nx.text}</div><div class="t2">📡 Live · ${dist} left · ~${mins} min</div></div></div>`;
-        html += `<div class="dir-actions"><button class="btn" id="followBtn" onclick="recenter()">${follow ? '🎯 Following you' : '🎯 Recenter'}</button>${canSpeak ? `<button class="btn" id="voiceBtn" onclick="toggleVoice()">${voiceOn ? '🔊 Voice: ON' : '🔇 Voice: OFF'}</button>` : ''}<button class="btn" onclick="stopTracking()">⏹ Stop</button></div>`;
-        voiceGuide(currentSteps);
+        html += `<div class="live-card"><div class="big">${nx.icon}</div><div><div class="t1">${T('liveNext', { d: fmtDist(currentSteps[0].dist), text: nx.text })}</div><div class="t2">${T('liveInfo', { dist, mins })}</div></div></div>`;
+        html += `<div class="dir-actions"><button class="btn" id="followBtn" onclick="recenter()">${follow ? T('following') : T('recenter')}</button>${canSpeak ? `<button class="btn" id="voiceBtn" onclick="toggleVoice()">${voiceOn ? T('voiceOn') : T('voiceOff')}</button>` : ''}<button class="btn" onclick="stopTracking()">${T('stop')}</button></div>`;
+        { const vL = speakLang(); voiceGuide(vL === LANG ? currentSteps : buildSteps(r, a, b, vL), currentSteps[0].dist, vL); }
       } else {
-        html += `<div class="dir-stats"><span>🚶 ${dist}</span><span>⏱ ~${mins} min</span></div>`;
-        html += `<div class="dir-actions"><button class="btn primary" onclick="startTracking()">📡 Start live tracking</button><button class="btn" onclick="startFly()">🎬 3D preview</button><button class="btn" onclick="shareRoute()">🔗 Share route</button></div>`;
+        html += `<div class="dir-stats"><span>🚶 ${dist}</span><span>${T('statMin', { mins })}</span></div>`;
+        html += `<div class="dir-actions"><button class="btn primary" onclick="startTracking()">${T('startLive')}</button><button class="btn" onclick="startFly()">${T('fly3d')}</button><button class="btn" onclick="shareRoute()">${T('shareRouteBtn')}</button></div>`;
       }
-      const missing = [a, b].filter(id => noRoutePlaces.has(id)).map(id => facilities.find(f => f.id === id).name);
+      const missing = [a, b].filter(id => noRoutePlaces.has(id)).map(id => pname(facilities.find(f => f.id === id)));
       if (missing.length) {
-        html += `<p class="dir-warn">⚠ The dotted part is a straight line, because the walking path to ${missing.join(' and ')} is not drawn yet.</p>`;
+        html += `<p class="dir-warn">${T('warnDotted', { names: missing.join(T('and')) })}</p>`;
       }
       if (a === 'me' && myGap > FAR_DIST) {
-        html += `<p class="dir-warn">⚠ The dotted part joins your location to the nearest campus path (${Math.round(myGap)} m away).</p>`;
+        html += `<p class="dir-warn">${T('warnDottedMe', { m: Math.round(myGap) })}</p>`;
       }
-      html += `<details id="stepsDet" ${stepsOpen ? 'open' : ''} ontoggle="stepsOpen = this.open"><summary class="steps-sum">🧭 Step-by-step (${currentSteps.length} steps)</summary>${stepsHTML(currentSteps, live ? 0 : -1)}</details>`;
+      html += `<details id="stepsDet" ${stepsOpen ? 'open' : ''} ontoggle="stepsOpen = this.open"><summary class="steps-sum">${T('stepsSum', { n: currentSteps.length })}</summary>${stepsHTML(currentSteps, live ? 0 : -1)}</details>`;
       dirResult.innerHTML = html;
       dirBox.scrollTop = keepScroll;
       if (!live) {
@@ -1159,7 +1421,7 @@
       if (!meDot) {
         meCircle = L.circle([lat, lng], { radius: rad, color: '#3b82f6', weight: 1, fillColor: '#3b82f6', fillOpacity: 0.15 }).addTo(meLayer);
         meDot = L.circleMarker([lat, lng], { radius: 8, color: '#ffffff', weight: 3, fillColor: '#3b82f6', fillOpacity: 1 })
-          .bindTooltip('You are here', { direction: 'top' }).addTo(meLayer);
+          .bindTooltip(T('youAreHere'), { direction: 'top' }).addTo(meLayer);
       } else {
         meCircle.setLatLng([lat, lng]); meCircle.setRadius(rad); meDot.setLatLng([lat, lng]);
       }
@@ -1167,7 +1429,7 @@
     function ensureMeOption() {
       if (meOptionAdded) return;
       const o = document.createElement('option');
-      o.value = 'me'; o.textContent = '📍 My location';
+      o.value = 'me'; o.textContent = T('myLocOpt');
       dirFrom.add(o, 1);
       meOptionAdded = true;
     }
@@ -1175,10 +1437,10 @@
     function locateMe(onDone) {
       openDirBox();
       if (!navigator.geolocation) {
-        dirResult.innerHTML = '<p class="dir-warn">⚠ Your browser does not support location.</p>';
+        dirResult.innerHTML = `<p class="dir-warn">${T('locNoSupport')}</p>`;
         return;
       }
-      dirResult.innerHTML = '<p class="dir-hint">📡 Finding your location...</p>';
+      dirResult.innerHTML = `<p class="dir-hint">${T('locFinding')}</p>`;
       navigator.geolocation.getCurrentPosition(pos => {
         const lat = pos.coords.latitude, lng = pos.coords.longitude, acc = pos.coords.accuracy || 0;
         showMe(lat, lng, acc);
@@ -1188,16 +1450,16 @@
         if (typeof onDone === 'function') { onDone(); return; }
         if (myGap > OFF_CAMPUS) { updateDirections(); return; }
         if (!dirTo.value) {
-          dirResult.innerHTML = '<p class="dir-hint">📍 Got your location. Now choose a destination (B).</p>';
+          dirResult.innerHTML = `<p class="dir-hint">${T('locGotChoose')}</p>`;
           map.flyTo([lat, lng], 18, { duration: 1.2 });
         } else {
           updateDirections();
         }
       }, err => {
-        const msg = err.code === 1 ? 'Location permission was denied. Allow location for this page in your browser, then tap 📍 again.'
-                  : err.code === 2 ? 'Could not find your location. Make sure location/GPS is turned on.'
-                  : 'Finding your location took too long. Please try again.';
-        dirResult.innerHTML = `<p class="dir-warn">⚠ ${msg}</p><p class="dir-hint">Note: location only works on https:// links or on localhost, not when the file is opened directly.</p>`;
+        const msg = err.code === 1 ? T('errDenied')
+                  : err.code === 2 ? T('errUnavailable')
+                  : T('errTimeout');
+        dirResult.innerHTML = `<p class="dir-warn">⚠ ${msg}</p><p class="dir-hint">${T('httpsNote')}</p>`;
       }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 });
     }
     document.getElementById('dirLocate').onclick = () => locateMe();
@@ -1220,37 +1482,45 @@
     try { voiceOn = localStorage.getItem('campusVoice') !== 'off'; } catch (e) {}
     const canSpeak = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
 
-    function speak(text) {
+    function speak(text, L) {
       if (!canSpeak || !voiceOn) return;
       try {
         window.speechSynthesis.cancel();                       // never let old sentences pile up
         const u = new SpeechSynthesisUtterance(text);
-        u.lang = 'en-IN'; u.rate = 0.95;
+        u.lang = L === 'kn' ? 'kn-IN' : 'en-IN'; u.rate = 0.95;
         window.speechSynthesis.speak(u);
       } catch (e) {}
     }
     function stopSpeaking() { if (canSpeak) { try { window.speechSynthesis.cancel(); } catch (e) {} } }
     function lowerFirst(t) { return t.charAt(0).toLowerCase() + t.slice(1); }
+    // The voice speaks Kannada only if the phone has a Kannada voice installed; otherwise it speaks English.
+    function hasKnVoice() {
+      try { return window.speechSynthesis.getVoices().some(v => String(v.lang || '').toLowerCase().replace('_', '-').startsWith('kn')); }
+      catch (e) { return false; }
+    }
+    function speakLang() { return (LANG === 'kn' && canSpeak && hasKnVoice()) ? 'kn' : 'en'; }
+    if (canSpeak) { try { window.speechSynthesis.getVoices(); } catch (e) {} }   // asks the phone to load its voice list early
 
     // called on every live update with the route steps: step 0 = where you are now, step 1 = the next instruction
-    function voiceGuide(steps) {
+    // d = metres to the next instruction, L = language the voice speaks
+    function voiceGuide(steps, d, L) {
       if (!tracking || !voiceOn || steps.length < 2) return;
-      const nx = steps[1], d = steps[0].dist;
+      const nx = steps[1];
       const key = nx.text + '|' + nx.at.lat.toFixed(6);
       if (key !== lastVoiceKey) {                              // a new instruction became the next one
         lastVoiceKey = key; voiceNowSaid = d <= 20;
-        speak(d > 20 ? 'In ' + fmtDist(d) + ', ' + lowerFirst(nx.text) : nx.text);
+        speak(d > 20 ? TL(L, 'inDist', { d: fmtDist(d, L), text: L === 'en' ? lowerFirst(nx.text) : nx.text }) : nx.text, L);
       } else if (d <= 20 && !voiceNowSaid) {                   // you are almost there: say it once more
         voiceNowSaid = true;
-        speak(nx.text);
+        speak(nx.text, L);
       }
     }
     function toggleVoice() {
       voiceOn = !voiceOn;
       try { localStorage.setItem('campusVoice', voiceOn ? 'on' : 'off'); } catch (e) {}
-      if (!voiceOn) stopSpeaking(); else speak('Voice directions on');
+      if (!voiceOn) stopSpeaking(); else speak(TL(speakLang(), 'voiceOnSay'), speakLang());
       const b = document.getElementById('voiceBtn');
-      if (b) b.textContent = voiceOn ? '🔊 Voice: ON' : '🔇 Voice: OFF';
+      if (b) b.textContent = voiceOn ? T('voiceOn') : T('voiceOff');
     }
 
     // ================= LIVE TRACKING =================
@@ -1259,7 +1529,7 @@
     function setFollow(v) { follow = v; updateFollowBtn(); }
     function updateFollowBtn() {
       const b = document.getElementById('followBtn');
-      if (b) b.textContent = follow ? '🎯 Following you' : '🎯 Recenter';
+      if (b) b.textContent = follow ? T('following') : T('recenter');
     }
     function followTo(lat, lng, z) {
       z = z || Math.max(map.getZoom(), 17);
@@ -1290,15 +1560,15 @@
     function startTracking() {
       stopFly();
       openDirBox();
-      if (!navigator.geolocation) { dirResult.innerHTML = '<p class="dir-warn">⚠ Your browser does not support location.</p>'; return; }
-      if (!dirTo.value) { dirResult.innerHTML = '<p class="dir-hint">Choose a destination (B) first, then start live tracking.</p>'; return; }
+      if (!navigator.geolocation) { dirResult.innerHTML = `<p class="dir-warn">${T('locNoSupport')}</p>`; return; }
+      if (!dirTo.value) { dirResult.innerHTML = `<p class="dir-hint">${T('chooseDestFirst')}</p>`; return; }
       if (watchId !== null) return;
       tracking = true; follow = true; lastTick = null;
       lastVoiceKey = ''; voiceNowSaid = false;
-      speak('Live directions started');                        // this runs from your tap, so the phone allows the voice
+      speak(TL(speakLang(), 'liveStartSay'), speakLang());                        // this runs from your tap, so the phone allows the voice
       stepsOpen = window.innerWidth > 700;          // keep the phone panel small: steps stay folded while walking
       keepAwake(true);
-      dirResult.innerHTML = '<p class="dir-hint">📡 Finding your location... allow location access if your browser asks.</p>';
+      dirResult.innerHTML = `<p class="dir-hint">${T('trackFinding')}</p>`;
       watchId = navigator.geolocation.watchPosition(onTrackPos, onTrackErr, { enableHighAccuracy: true, maximumAge: 2000, timeout: 20000 });
     }
 
@@ -1323,9 +1593,9 @@
       if (!dest) { stopTracking(true); return; }
       if (hav([lat, lng], [dest.lat, dest.lng]) <= ARRIVE_M) {
         stopTracking(true);
-        speak('You have arrived at ' + dest.name);
+        { const vL = speakLang(); speak(TL(vL, 'arrivedSay', { place: pname(dest, vL) }), vL); }
         lastRoute = null; currentSteps = []; routeLayer.clearLayers();
-        dirResult.innerHTML = `<div class="live-card"><div class="big">🏁</div><div><div class="t1">You have arrived at ${dest.name}!</div><div class="t2">Live tracking stopped.</div></div></div>`;
+        dirResult.innerHTML = `<div class="live-card"><div class="big">🏁</div><div><div class="t1">${T('arrivedT1', { place: pname(dest) })}</div><div class="t2">${T('arrivedT2')}</div></div></div>`;
         return;
       }
       updateDirections(true, true);
@@ -1335,9 +1605,9 @@
     function onTrackErr(err) {
       if (err.code === 1) {
         stopTracking(true);
-        dirResult.innerHTML = '<p class="dir-warn">⚠ Location permission was denied. Allow location for this page in your browser, then try again.</p><p class="dir-hint">Note: location only works on https:// links or on localhost, not when the file is opened directly.</p>';
+        dirResult.innerHTML = `<p class="dir-warn">${T('trackDenied')}</p><p class="dir-hint">${T('httpsNote')}</p>`;
       } else if (!lastTick) {
-        dirResult.innerHTML = '<p class="dir-warn">⚠ Still looking for your location. Make sure GPS/location is on (it works best outdoors).</p>';
+        dirResult.innerHTML = `<p class="dir-warn">${T('trackStill')}</p>`;
       }
     }
 
@@ -1491,7 +1761,7 @@
       el.className = 'gpin' + (withLabel ? ' big' : '');
       el.style.setProperty('--c', TYPE[f.type].color);
       const em = document.createElement('span'); em.textContent = TYPE[f.type].emoji; el.appendChild(em);
-      if (withLabel) { const b = document.createElement('b'); b.textContent = f.name; el.appendChild(b); }
+      if (withLabel) { const b = document.createElement('b'); b.textContent = pname(f); el.appendChild(b); }
       return el;
     }
     function glTeardown() {
@@ -1568,7 +1838,7 @@
       panel.classList.add('hidden');                // full-screen view while it plays
       document.getElementById('flyHud').classList.add('show');
       document.getElementById('flyPause').textContent = '⏸';
-      document.getElementById('flyTxt').textContent = '🎬 3D preview';
+      document.getElementById('flyTxt').textContent = T('fly3d');
       updateHud(0);
       clearTimeout(flyTimer);
       flyMode = glSupported() ? 'gl' : 'tilt';
@@ -1619,7 +1889,7 @@
       if (flyT >= 1) {
         flyDone = true;
         document.getElementById('flyPause').textContent = '↻';
-        document.getElementById('flyTxt').textContent = '🏁 Arrived';
+        document.getElementById('flyTxt').textContent = T('arrivedHud');
         if (flyMode !== 'gl') return;
       }
       flyRaf = requestAnimationFrame(flyFrame);
@@ -1639,7 +1909,7 @@
           map.setView(a, flyData.zoom, { animate: false });
           flyGlow.setLatLngs([a]); flyCore.setLatLngs([a]); flyWalker.setLatLng(a);
         }
-        document.getElementById('flyTxt').textContent = '🎬 3D preview';
+        document.getElementById('flyTxt').textContent = T('fly3d');
         flyLast = performance.now();
         cancelAnimationFrame(flyRaf);
         flyRaf = requestAnimationFrame(flyFrame);
@@ -1688,7 +1958,7 @@
       locateMe(() => {
         openDirBox();
         if (myGap > OFF_CAMPUS) {
-          dirResult.innerHTML = `<p class="dir-warn">⚠ You are about ${Math.round(myGap)} m from the campus paths, so I cannot find the nearest ${opt.label.toLowerCase()} by walking. Try again when you are on campus.</p>`;
+          dirResult.innerHTML = `<p class="dir-warn">${T('nearFar', { m: Math.round(myGap), what: nearWhat(opt) })}</p>`;
           return;
         }
         let best = null;
@@ -1696,20 +1966,21 @@
           const r = shortestPath('me', f.id);
           if (r && (!best || r.dist < best.r.dist)) best = { f, r };
         });
-        if (!best) { dirResult.innerHTML = `<p class="dir-warn">⚠ No walking route found to a ${opt.label.toLowerCase()}.</p>`; return; }
+        if (!best) { dirResult.innerHTML = `<p class="dir-warn">${T('nearNone', { what: nearWhat(opt) })}</p>`; return; }
         dirFrom.value = 'me';
         dirTo.value = String(best.f.id);
         updateDirections();
-        dirResult.insertAdjacentHTML('afterbegin', `<p class="dir-hint">⭐ Nearest ${opt.label.toLowerCase()}: <b>${best.f.name}</b></p>`);
+        dirResult.insertAdjacentHTML('afterbegin', `<p class="dir-hint">${T('nearBest', { what: nearWhat(opt), name: pname(best.f) })}</p>`);
       });
     }
 
     function buildNearRow() {
       const row = document.getElementById('nearRow');
+      row.querySelectorAll('.chip').forEach(c => c.remove());     // (rebuilt when the language changes)
       NEAR_OPTIONS.forEach(o => {
         const b = document.createElement('button');
         b.className = 'chip';
-        b.textContent = o.emoji + ' ' + o.label;
+        b.textContent = o.emoji + ' ' + nearLabel(o);
         b.onclick = () => nearestTo(o);
         row.appendChild(b);
       });
@@ -1733,8 +2004,8 @@
       opts = opts || {};
       shareUrl = opts.url || PUBLIC_URL;
       shareFile = opts.file || 'campus-navigator-qr.png';
-      document.getElementById('shareTitle').textContent = opts.title || '🔗 Share Campus Navigator';
-      document.getElementById('shareDesc').textContent = opts.desc || 'Scan this QR code with a phone camera to open the app.';
+      document.getElementById('shareTitle').textContent = opts.title || T('shareTitle');
+      document.getElementById('shareDesc').textContent = opts.desc || T('shareDesc');
       document.getElementById('shareUrl').textContent = shareUrl;
       document.getElementById('nativeShareBtn').style.display = navigator.share ? '' : 'none';
       shareModal.classList.add('show');
@@ -1754,17 +2025,17 @@
     function sharePlace(id) {
       const f = facilities.find(x => x.id === id);
       if (!f) return;
-      openShare({ url: linkTo({ place: id }), title: '🔗 ' + f.name, desc: 'Scan to open ' + f.name + ' on the campus map.', file: 'qr-' + slug(f.name) + '.png' });
+      openShare({ url: linkTo({ place: id }), title: '🔗 ' + pname(f), desc: T('sharePlaceDesc', { name: pname(f) }), file: 'qr-' + slug(f.name) + '.png' });
     }
     function shareRoute() {
       const a = dirFrom.value, b = Number(dirTo.value);
       if (!b) return;
-      const to = placeName(b);
+      const to = placeName(b), toEn = placeName(b, 'en');      // file names always use the English name
       if (a && a !== 'me') {
-        const from = placeName(Number(a));
-        openShare({ url: linkTo({ from: a, to: b }), title: '🔗 Share route', desc: 'Scan to open walking directions from ' + from + ' to ' + to + '.', file: 'qr-route-' + slug(from) + '-to-' + slug(to) + '.png' });
+        const from = placeName(Number(a)), fromEn = placeName(Number(a), 'en');
+        openShare({ url: linkTo({ from: a, to: b }), title: T('shareRouteTitle'), desc: T('shareRouteDesc', { from, to }), file: 'qr-route-' + slug(fromEn) + '-to-' + slug(toEn) + '.png' });
       } else {
-        openShare({ url: linkTo({ to: b, go: 1 }), title: '🧭 Navigate to ' + to, desc: 'Scan to get live walking directions to ' + to + ' from wherever you are standing.', file: 'qr-navigate-' + slug(to) + '.png' });
+        openShare({ url: linkTo({ to: b, go: 1 }), title: T('shareNavTitle', { to }), desc: T('shareNavDesc', { to }), file: 'qr-navigate-' + slug(toEn) + '.png' });
       }
     }
 
@@ -1774,7 +2045,7 @@
 
     document.getElementById('copyLinkBtn').onclick = e => {
       const btn = e.currentTarget;
-      const done = () => { btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = 'Copy link', 1400); };
+      const done = () => { btn.textContent = T('copied'); setTimeout(() => btn.textContent = T('copyLink'), 1400); };
       const fallback = () => {
         const t = document.createElement('textarea'); t.value = shareUrl; document.body.appendChild(t);
         t.select(); try { document.execCommand('copy'); } catch (err) {} t.remove(); done();
@@ -1829,6 +2100,11 @@
       if (localStorage.getItem('campusAdmin') === '1') document.body.classList.add('admin');
     } catch (e) {}
     document.getElementById('themeBtn').onclick = () => setTheme(document.body.dataset.theme === 'dark' ? 'light' : 'dark');
+    document.getElementById('langBtn').onclick = () => setLang(LANG === 'en' ? 'kn' : 'en');
+    document.documentElement.lang = LANG;
+    document.title = T('docTitle');
+    applyStaticLang();
+    updateLangBtn();
     buildChips();
     buildNearRow();
     applyFilter();
