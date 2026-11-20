@@ -5,6 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Campus Navigator - APS College of Engineering</title>
 
+  <!-- Installable app (PWA): manifest, icons and colours for the phone -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0b0d1a">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Campus Nav">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
   <!-- Shows any error on the screen so problems are easy to see -->
   <script>
     window.addEventListener('error', function (e) {
@@ -336,6 +346,15 @@
 
     /* ---------- NEAREST TO ME ---------- */
     #nearRow { flex: none; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 10px 0 0; }
+    /* Open now / Closed badge */
+    .ob { display: inline-block; font: 600 10.5px 'Poppins', 'Noto Sans Kannada', sans-serif; padding: 2px 8px; border-radius: 999px; border: 1px solid transparent; white-space: nowrap; }
+    .ob.open   { color: #16a34a; background: rgba(34,197,94,.16);  border-color: rgba(34,197,94,.45); }
+    .ob.soon   { color: #d97706; background: rgba(245,158,11,.16); border-color: rgba(245,158,11,.5); }
+    .ob.closed { color: #dc2626; background: rgba(239,68,68,.14);  border-color: rgba(239,68,68,.45); }
+    .pop-open { margin: 2px 0 6px; }
+    .card .ob { margin-left: 6px; vertical-align: 1px; }
+    #installBtn { display: none; }
+    @media (max-width: 700px) { #installBtn .inst-txt { display: none; } }
     .no-match { padding: 14px; text-align: center; color: var(--muted); font-size: 13px; }
     #langBtn { font-weight: 600; }
     .near-lbl { flex: none; font: 600 11px 'Poppins', 'Noto Sans Kannada', sans-serif; color: var(--muted); white-space: nowrap; }
@@ -429,6 +448,7 @@
     <button class="btn" id="toggle">☰</button>
     <button class="btn" id="themeBtn" title="Switch between dark and bright" data-i18n-title="themeTip"></button>
     <button class="btn" id="langBtn" title="Switch language" data-i18n-title="langTip"></button>
+    <button class="btn" id="installBtn" title="Install the app on your phone" data-i18n-title="installTip">📲<span class="inst-txt" data-i18n="installTxt"> Install</span></button>
     <div class="divider" id="toolDivider"></div>
     <button class="btn" id="toolBtn">📍 Path tool: OFF</button>
   </div>
@@ -634,6 +654,9 @@
         stepAt: "{turn} at {place}", stepNear: "{turn} near {place}", stepPass: "Pass {place}", stepArrive: "Arrive at {place}",
         walkDist: "Walk {d}", uturn: "Make a U-turn", sharpR: "Take a sharp right", sharpL: "Take a sharp left",
         turnR: "Turn right", turnL: "Turn left", bearR: "Bear right", bearL: "Bear left",
+        installTxt: " Install", installTip: "Install the app on your phone",
+        openNow: "Open now", closingSoon: "Closing soon", closed: "Closed", closedToday: "Closed today",
+        closesAt: "Closes at {t}", opensAt: "Opens at {t}",
         voiceOnSay: "Voice directions on", liveStartSay: "Live directions started",
         arrivedSay: "You have arrived at {place}", inDist: "In {d}, {text}"
       },
@@ -679,6 +702,9 @@
         stepAt: "{place} ಬಳಿ {turn}", stepNear: "{place} ಬಳಿ {turn}", stepPass: "{place} ಹಾದು ಹೋಗಿ", stepArrive: "{place} ತಲುಪಿದ್ದೀರಿ",
         walkDist: "{d} ನಡೆಯಿರಿ", uturn: "ಯು-ಟರ್ನ್ ಮಾಡಿ", sharpR: "ತೀವ್ರವಾಗಿ ಬಲಕ್ಕೆ ತಿರುಗಿ", sharpL: "ತೀವ್ರವಾಗಿ ಎಡಕ್ಕೆ ತಿರುಗಿ",
         turnR: "ಬಲಕ್ಕೆ ತಿರುಗಿ", turnL: "ಎಡಕ್ಕೆ ತಿರುಗಿ", bearR: "ಸ್ವಲ್ಪ ಬಲಕ್ಕೆ ತಿರುಗಿ", bearL: "ಸ್ವಲ್ಪ ಎಡಕ್ಕೆ ತಿರುಗಿ",
+        installTxt: " ಇನ್‌ಸ್ಟಾಲ್", installTip: "ಆ್ಯಪ್ ಅನ್ನು ನಿಮ್ಮ ಫೋನ್‌ನಲ್ಲಿ ಇನ್‌ಸ್ಟಾಲ್ ಮಾಡಿ",
+        openNow: "ಈಗ ತೆರೆದಿದೆ", closingSoon: "ಶೀಘ್ರದಲ್ಲೇ ಮುಚ್ಚುತ್ತದೆ", closed: "ಮುಚ್ಚಿದೆ", closedToday: "ಇಂದು ಮುಚ್ಚಿದೆ",
+        closesAt: "{t} ಕ್ಕೆ ಮುಚ್ಚುತ್ತದೆ", opensAt: "{t} ಕ್ಕೆ ತೆರೆಯುತ್ತದೆ",
         voiceOnSay: "ಧ್ವನಿ ಮಾರ್ಗದರ್ಶನ ಆನ್ ಆಗಿದೆ", liveStartSay: "ಲೈವ್ ಮಾರ್ಗದರ್ಶನ ಆರಂಭವಾಗಿದೆ",
         arrivedSay: "ನೀವು {place} ತಲುಪಿದ್ದೀರಿ", inDist: "{d} ನಂತರ, {text}"
       }
@@ -706,6 +732,56 @@
       };
       return part(m[1], m[2]) + ' ' + m[1] + ' ರಿಂದ ' + part(m[3], m[4]) + ' ' + m[3] + ' ರವರೆಗೆ';
     }
+
+    // ---------- Open now / Closed badge (made from each place's  timings: "9:00 AM - 5:00 PM") ----------
+    // Places without timings show no badge. Optional: add  closedDays: [0]  to a place to show it closed on Sundays
+    // (0 = Sunday, 1 = Monday ... 6 = Saturday). Times are read in Indian time, whatever the phone's own clock says.
+    const SOON_MIN = 30;                       // "Closing soon" appears this many minutes before closing
+    function campusNow() {
+      try {
+        const parts = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Kolkata', weekday: 'short', hour: '2-digit', minute: '2-digit', hour12: false }).formatToParts(new Date());
+        const get = ty => (parts.find(p => p.type === ty) || {}).value;
+        const day = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(get('weekday'));
+        const h = parseInt(get('hour'), 10) % 24, m = parseInt(get('minute'), 10);
+        if (day >= 0 && !isNaN(h) && !isNaN(m)) return { day, min: h * 60 + m };
+      } catch (e) {}
+      const d = new Date();
+      return { day: d.getDay(), min: d.getHours() * 60 + d.getMinutes() };
+    }
+    function clockTxt(tm, ap, L) {             // "5:00" + "PM"  ->  "5:00 PM"   or in Kannada   "ಸಂಜೆ 5:00"
+      if (L !== 'kn') return tm + ' ' + ap.toUpperCase();
+      if (ap.toUpperCase() === 'AM') return 'ಬೆಳಿಗ್ಗೆ ' + tm;
+      const h = parseInt(tm, 10);
+      return ((h === 12 || h < 4) ? 'ಮಧ್ಯಾಹ್ನ ' : 'ಸಂಜೆ ') + tm;
+    }
+    // returns { cls: 'open' | 'soon' | 'closed', text: '...' }  or null when the place has no timings
+    function openStatus(f, L) {
+      L = L || LANG;
+      if (!f.timings) return null;
+      const m = f.timings.match(/^\s*(\d{1,2}:\d{2})\s*(AM|PM)\s*-\s*(\d{1,2}:\d{2})\s*(AM|PM)\s*$/i);
+      if (!m) return null;
+      const toMin = (tm, ap) => { const p = tm.split(':'); let h = parseInt(p[0], 10) % 12; if (ap.toUpperCase() === 'PM') h += 12; return h * 60 + parseInt(p[1], 10); };
+      const o = toMin(m[1], m[2]), c = toMin(m[3], m[4]), now = campusNow();
+      if (f.closedDays && f.closedDays.indexOf(now.day) >= 0) return { cls: 'closed', text: TL(L, 'closedToday') };
+      if (now.min >= o && now.min < c) {
+        const left = c - now.min;
+        return { cls: left <= SOON_MIN ? 'soon' : 'open',
+                 text: (left <= SOON_MIN ? TL(L, 'closingSoon') : TL(L, 'openNow')) + ' · ' + TL(L, 'closesAt', { t: clockTxt(m[3], m[4], L) }) };
+      }
+      if (now.min < o) return { cls: 'closed', text: TL(L, 'closed') + ' · ' + TL(L, 'opensAt', { t: clockTxt(m[1], m[2], L) }) };
+      return { cls: 'closed', text: TL(L, 'closed') };
+    }
+    function openBadge(f) {
+      const st = openStatus(f);
+      return st ? `<span class="ob ${st.cls}" data-fid="${f.id}">${st.text}</span>` : '';
+    }
+    function refreshBadges() {                 // keeps the badges right as the time passes (runs every minute)
+      document.querySelectorAll('.ob[data-fid]').forEach(el => {
+        const f = facilities.find(x => x.id === Number(el.dataset.fid));
+        if (f) el.outerHTML = openBadge(f);
+      });
+    }
+
     function nearLabel(o) { return LANG === 'kn' ? (NEAR_KN[o.label] || o.label) : o.label; }
     function nearWhat(o) { return LANG === 'kn' ? nearLabel(o) : o.label.toLowerCase(); }
 
@@ -796,6 +872,7 @@
         </div>
         <p class="pop-info">${pinfo(f)}</p>
         ${f.timings ? `<p class="pop-time">🕒 ${ptime(f)}</p>` : ''}
+        ${openStatus(f) ? `<div class="pop-open">${openBadge(f)}</div>` : ''}
         <div class="pop-btns">
           <button class="dir" onclick="startDirections(${f.id})">${T('btnDirections')}</button>
           <button class="dir alt" onclick="sharePlace(${f.id})" title="${T('popShareTip')}">${T('popShare')}</button>
@@ -835,6 +912,7 @@
       m.bindPopup(popupHTML(f), { className: 'glass-pop', closeButton: false, minWidth: 200, maxWidth: 260 });
       m.bindTooltip(pname(f), { permanent: true, direction: 'bottom', offset: [0, 18], className: 'lbl', opacity: 1 });
       m.on('click', () => setActive(f.id));
+      m.on('popupopen', () => m.setPopupContent(popupHTML(f)));
       m.on('popupclose', () => { if (selectedId === f.id) setActive(null); });
       markers[f.id] = m;
     });
@@ -913,7 +991,7 @@
         div.dataset.id = f.id;
         div.innerHTML = `
           <div class="ico" style="--c:${ty.color}">${ty.emoji}</div>
-          <div><div class="name">${pname(f)}</div><div class="type">${ptype(f.type)}</div></div>`;
+          <div><div class="name">${pname(f)}</div><div class="type">${ptype(f.type)}${openBadge(f)}</div></div>`;
         div.onclick = () => selectFacility(f);
         listDiv.appendChild(div);
       });
@@ -2116,6 +2194,28 @@
     fitAll();
     updateLabels();
     openFromLink();
+
+    // ================= INSTALLABLE APP (PWA) =================
+    // The browser offers "Install" when the app is opened from an https:// link (like your GitHub Pages link).
+    // The button below appears only when the browser says the app can be installed, and hides once it is installed.
+    let installEvent = null;
+    const installBtn = document.getElementById('installBtn');
+    const isStandalone = () => (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
+    window.addEventListener('beforeinstallprompt', e => {
+      e.preventDefault();
+      installEvent = e;
+      if (!isStandalone()) installBtn.style.display = 'inline-block';
+    });
+    installBtn.onclick = () => {
+      if (!installEvent) return;
+      installEvent.prompt();
+      installEvent.userChoice.then(() => { installEvent = null; installBtn.style.display = 'none'; }).catch(() => {});
+    };
+    window.addEventListener('appinstalled', () => { installEvent = null; installBtn.style.display = 'none'; });
+    if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+      window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
+    }
+    setInterval(refreshBadges, 60000);
   </script>
 </body>
 </html>
