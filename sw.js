@@ -3,7 +3,7 @@
    - Libraries, fonts and map pictures you have already seen are saved on the phone, so the app opens even with a weak signal.
    When you upload a new index.html, nothing else needs changing. If you change this file or the icons, change the
    number in VERSION below so phones pick up the new copy. */
-const VERSION = 'v1';
+const VERSION = 'v2';
 const APP_CACHE = 'campus-nav-app-' + VERSION;
 const LIB_CACHE = 'campus-nav-libs-' + VERSION;
 const TILE_CACHE = 'campus-nav-tiles-' + VERSION;
