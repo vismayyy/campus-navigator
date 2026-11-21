@@ -1,13 +1,12 @@
 {
-  "name": "Campus Navigator - APS College of Engineering",
-  "short_name": "Campus Nav",
-  "description": "Find places and walking directions around APS College of Engineering.",
+  "name": "APS College Navigator",
+  "short_name": "APS Navigator",
+  "description": "Campus navigation for A.P.S. College of Engineering, Bengaluru",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "orientation": "any",
-  "background_color": "#0b0d1a",
-  "theme_color": "#0b0d1a",
+  "background_color": "#ffffff",
+  "theme_color": "#1a2a4a",
   "icons": [
     { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
     { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
