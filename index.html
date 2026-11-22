@@ -310,6 +310,13 @@
       background: var(--solid); border: 2px solid var(--c); box-shadow: 0 0 10px var(--c), 0 3px 8px rgba(0,0,0,.4); pointer-events: none;
     }
     .gpin.big { width: 34px; height: 34px; font-size: 17px; border-width: 2.5px; z-index: 2; }
+    /* clean 3D view: pins fade in only when the camera is near them, the rest stay hidden */
+    #map3d .gpin { width: 22px; height: 22px; font-size: 11px; box-shadow: 0 0 6px var(--c), 0 2px 5px rgba(0,0,0,.4); }
+    #map3d .gpin.big { width: 32px; height: 32px; font-size: 16px; }
+    .gpin.glp { opacity: 0; transition: opacity .6s ease; will-change: opacity; }
+    .gpin.glp.on { opacity: 1; }
+    .gpin.glp b { display: none; }
+    .gpin.glp.big b, .gpin.glp.near b { display: block; }
     .gpin b {
       position: absolute; top: 100%; left: 50%; transform: translateX(-50%); margin-top: 5px; white-space: nowrap;
       font: 600 11px 'Poppins', 'Noto Sans Kannada', sans-serif; color: var(--text); background: var(--solid);
@@ -1700,7 +1707,7 @@
     let flyOn = false, flyPaused = false, flyDone = false, flyRaf = 0, flyT = 0, flyLast = 0, flyData = null;
     let flyTimer = 0, tiltTimer = 0, panelWasHidden = false, flyWalker = null, flyGlow = null, flyCore = null;
     let flyMode = 'tilt';                       // 'gl' = real 3D, 'tilt' = fallback
-    let gl = null, glWalker = null, glMarkers = [], glBear = 0, glLoadTimer = 0, glFrameNo = 0;
+    let gl = null, glWalker = null, glMarkers = [], glPins = [], glBear = 0, glLoadTimer = 0, glFrameNo = 0;
 
     // Height (metres) of the coloured landmark block drawn at each place. These blocks make sure every
     // place is visible in 3D even where OpenStreetMap has no building drawn. Change the numbers freely.
@@ -1761,7 +1768,7 @@
       return [pts[lo][0] + (pts[lo + 1][0] - pts[lo][0]) * f, pts[lo][1] + (pts[lo + 1][1] - pts[lo][1]) * f];
     }
     function headingAt(s) {                     // which way the path points a little ahead of s
-      const a = posAtDist(s), b = posAtDist(Math.min(flyData.total, s + 40));
+      const a = posAtDist(s), b = posAtDist(Math.min(flyData.total, s + 70));
       return hav(a, b) < 2 ? null : bearingDeg(a, b);
     }
     function glBlocks() {
@@ -1837,18 +1844,26 @@
     }
     function glPinEl(f, withLabel) {
       const el = document.createElement('div');
-      el.className = 'gpin' + (withLabel ? ' big' : '');
+      el.className = 'gpin glp' + (withLabel ? ' big on' : '');
       el.style.setProperty('--c', TYPE[f.type].color);
       const em = document.createElement('span'); em.textContent = TYPE[f.type].emoji; el.appendChild(em);
-      if (withLabel) { const b = document.createElement('b'); b.textContent = pname(f); el.appendChild(b); }
+      { const b = document.createElement('b'); b.textContent = pname(f); el.appendChild(b); }
       return el;
     }
     function glTeardown() {
       clearTimeout(glLoadTimer);
-      glMarkers.forEach(m => m.remove()); glMarkers = [];
+      glMarkers.forEach(m => m.remove()); glMarkers = []; glPins = [];
       if (glWalker) { glWalker.remove(); glWalker = null; }
       if (gl) { try { gl.remove(); } catch (e) {} gl = null; }
       document.getElementById('map3d').classList.remove('show');
+    }
+    const GL_PIN_NEAR = 70;                     // metres: pins closer than this to the walker fade in (change freely)
+    function glUpdatePins(pos) {
+      glPins.forEach(o => {
+        const near = hav(pos, [o.f.lat, o.f.lng]) < GL_PIN_NEAR;
+        o.el.classList.toggle('on', o.end || near);
+        o.el.classList.toggle('near', near);
+      });
     }
     function glSetTrail(coords) {
       const src = gl && gl.getSource('trail');
@@ -1870,8 +1885,9 @@
         attributionControl: { compact: true }
       });
       gl.on('error', e => console.warn('3D map:', e && e.error && e.error.message));
-      glMarkers = facilities.map(f => new maplibregl.Marker({ element: glPinEl(f, f.id === a || f.id === b), anchor: 'center' })
-        .setLngLat([f.lng, f.lat]).addTo(gl));
+      glPins = facilities.map(f => ({ f, el: glPinEl(f, f.id === a || f.id === b), end: f.id === a || f.id === b }));
+      glMarkers = glPins.map(o => new maplibregl.Marker({ element: o.el, anchor: 'center' })
+        .setLngLat([o.f.lng, o.f.lat]).addTo(gl));
       const wrap = document.createElement('div');
       wrap.innerHTML = '<div class="walker"><div class="w-ring"></div><div class="w-shadow"></div><div class="w-dot"></div></div>';
       glWalker = new maplibregl.Marker({ element: wrap, anchor: 'center' }).setLngLat(lngLat(p0)).addTo(gl);
@@ -1945,6 +1961,7 @@
       if (flyMode === 'gl') {
         if (!gl) return;
         glWalker.setLngLat(lngLat(pos));
+        if ((glFrameNo & 7) === 0) glUpdatePins(pos);                     // show only the pins close to the camera
         if ((glFrameNo++ & 1) === 0 || flyT >= 1) {                       // trail every 2nd frame is plenty
           const trail = pts.slice(0, i + 1).map(lngLat); trail.push(lngLat(pos));
           glSetTrail(trail);
@@ -1952,10 +1969,9 @@
         const target = flyDone ? null : headingAt(s);                     // turn the camera smoothly with the path
         if (target !== null) {
           const d = ((target - glBear + 540) % 360) - 180;
-          glBear = (glBear + d * (1 - Math.exp(-dt / 450)) + 360) % 360;
+          glBear = (glBear + d * (1 - Math.exp(-dt / 900)) + 360) % 360;
         }
-        if (flyDone) glBear = (glBear + dt * 0.015) % 360;                // arrived: slow victory lap around the destination
-        gl.jumpTo({ center: lngLat(pos), bearing: glBear });
+                gl.jumpTo({ center: lngLat(pos), bearing: glBear });
       } else {
         flyWalker.setLatLng(pos);
         const trail = pts.slice(0, i + 1); trail.push(pos);
