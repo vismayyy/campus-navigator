@@ -300,8 +300,9 @@
     #map3d { position: fixed; inset: 0; z-index: 900; display: none; background: var(--fog, #111); }
     #map3d.show { display: block; animation: glin .6s ease; }
     #gl3d { position: absolute; inset: 0; }
-    #glFog { position: absolute; inset: 0; z-index: 2; pointer-events: none;
-             background: linear-gradient(to bottom, var(--fog) 0%, transparent 12%); }
+    #glFog { position: absolute; inset: 0; z-index: 2; pointer-events: none; background: var(--fog);
+             -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 9%, rgba(0,0,0,.55) 22%, rgba(0,0,0,.2) 34%, transparent 46%);
+             mask-image: linear-gradient(to bottom, #000 0%, #000 9%, rgba(0,0,0,.55) 22%, rgba(0,0,0,.2) 34%, transparent 46%); }
     @keyframes glin { from { opacity: 0; } to { opacity: 1; } }
     #map3d .maplibregl-canvas { outline: none; }
     #map3d .maplibregl-ctrl-bottom-right, #map3d .maplibregl-ctrl-bottom-left { bottom: calc(62px + env(safe-area-inset-bottom, 0px)); }
@@ -332,9 +333,13 @@
     #flyHud.show { display: flex; }
     body.flying #controls { display: none; }
     #flyHud .btn { padding: 6px 10px; }
-    .fly-bar { flex: 1; height: 6px; border-radius: 6px; background: var(--card); border: 1px solid var(--border); overflow: hidden; }
+    .fly-scrub { flex: 1; position: relative; padding: 11px 0; cursor: pointer; touch-action: none; }
+    .fly-bar { height: 6px; border-radius: 6px; background: var(--card); border: 1px solid var(--border); overflow: hidden; }
+    #flyThumb { position: absolute; top: 50%; left: 0; width: 16px; height: 16px; margin: -8px 0 0 -8px; border-radius: 50%;
+                background: #fff; border: 3px solid var(--accent2); box-shadow: 0 0 8px var(--accent2); pointer-events: none; }
+    #flySpeed { min-width: 40px; font-variant-numeric: tabular-nums; }
     #flyFill { height: 100%; width: 0; background: linear-gradient(90deg, var(--accent), var(--accent2)); }
-    #flyTxt { font: 600 11.5px 'Poppins', 'Noto Sans Kannada', sans-serif; color: var(--text); white-space: nowrap; }
+    #flyTxt { font: 600 11.5px 'Poppins', 'Noto Sans Kannada', sans-serif; color: var(--text); white-space: nowrap; min-width: 96px; text-align: center; font-variant-numeric: tabular-nums; }
     .walker { position: relative; width: 0; height: 0; }
     .walker .w-ring {
       position: absolute; left: -26px; top: -26px; width: 52px; height: 52px; border-radius: 50%;
@@ -479,8 +484,9 @@
   <!-- 3D FLY-THROUGH CONTROLS -->
   <div id="flyHud" class="glass">
     <button class="btn" id="flyPause" title="Pause / play" data-i18n-title="pauseTip">⏸</button>
-    <div class="fly-bar"><div id="flyFill"></div></div>
+    <div class="fly-scrub" id="flyScrub"><div class="fly-bar"><div id="flyFill"></div></div><div id="flyThumb"></div></div>
     <span id="flyTxt" data-i18n="fly3d">🎬 3D preview</span>
+    <button class="btn" id="flySpeed" title="Speed" data-i18n-title="speedTip">1×</button>
     <button class="btn" id="flyClose" title="Close the 3D preview" data-i18n-title="flyCloseTip">✕</button>
   </div>
 
@@ -628,7 +634,7 @@
         themeTip: "Switch between dark and bright", langSwitch: "🌐 ಕನ್ನಡ", langTip: "Switch language",
         places: "{n} places", noMatch: "No places found", all: "All",
         chooseStart: "Choose starting point...", chooseDest: "Choose destination...", myLocOpt: "📍 My location",
-        pauseTip: "Pause / play", flyCloseTip: "Close the 3D preview", fly3d: "🎬 3D preview", arrivedHud: "🏁 Arrived",
+        pauseTip: "Pause / play", flyCloseTip: "Close the 3D preview", fly3d: "🎬 3D preview", arrivedHud: "🏁 Arrived", flyLeft: "{m} m left · {t} min", speedTip: "Speed",
         shareTitle: "🔗 Share Campus Navigator", shareDesc: "Scan this QR code with a phone camera to open the app.",
         copyLink: "Copy link", copied: "Copied!", shareMore: "Share...", dlQr: "Download QR",
         sharePlaceDesc: "Scan to open {name} on the campus map.",
@@ -676,7 +682,7 @@
         themeTip: "ಕತ್ತಲೆ ಮತ್ತು ಬೆಳಕಿನ ಮೋಡ್ ಬದಲಿಸಿ", langSwitch: "🌐 English", langTip: "ಭಾಷೆ ಬದಲಿಸಿ",
         places: "{n} ಸ್ಥಳಗಳು", noMatch: "ಯಾವುದೇ ಸ್ಥಳ ಸಿಗಲಿಲ್ಲ", all: "ಎಲ್ಲಾ",
         chooseStart: "ಆರಂಭದ ಸ್ಥಳ ಆಯ್ಕೆಮಾಡಿ...", chooseDest: "ಗಮ್ಯಸ್ಥಾನ ಆಯ್ಕೆಮಾಡಿ...", myLocOpt: "📍 ನನ್ನ ಸ್ಥಳ",
-        pauseTip: "ವಿರಾಮ / ಪ್ಲೇ", flyCloseTip: "3D ಪೂರ್ವವೀಕ್ಷಣೆ ಮುಚ್ಚಿ", fly3d: "🎬 3D ಪೂರ್ವವೀಕ್ಷಣೆ", arrivedHud: "🏁 ತಲುಪಿದ್ದೀರಿ",
+        pauseTip: "ವಿರಾಮ / ಪ್ಲೇ", flyCloseTip: "3D ಪೂರ್ವವೀಕ್ಷಣೆ ಮುಚ್ಚಿ", fly3d: "🎬 3D ಪೂರ್ವವೀಕ್ಷಣೆ", arrivedHud: "🏁 ತಲುಪಿದ್ದೀರಿ", flyLeft: "{m} ಮೀ ಬಾಕಿ · {t} ನಿಮಿಷ", speedTip: "ವೇಗ",
         shareTitle: "🔗 ಕ್ಯಾಂಪಸ್ ಮಾರ್ಗದರ್ಶಿ ಹಂಚಿಕೊಳ್ಳಿ", shareDesc: "ಆ್ಯಪ್ ತೆರೆಯಲು ಫೋನ್ ಕ್ಯಾಮೆರಾದಿಂದ ಈ QR ಕೋಡ್ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ.",
         copyLink: "ಲಿಂಕ್ ನಕಲಿಸಿ", copied: "ನಕಲಾಯಿತು!", shareMore: "ಹಂಚಿಕೊಳ್ಳಿ...", dlQr: "QR ಡೌನ್‌ಲೋಡ್",
         sharePlaceDesc: "ಕ್ಯಾಂಪಸ್ ನಕ್ಷೆಯಲ್ಲಿ {name} ತೆರೆಯಲು ಸ್ಕ್ಯಾನ್ ಮಾಡಿ.",
@@ -823,7 +829,7 @@
       if (meDot) meDot.setTooltipContent(T('youAreHere'));
       updateFollowBtn();
       lastVoiceKey = '';
-      if (flyOn) document.getElementById('flyTxt').textContent = flyDone ? T('arrivedHud') : T('fly3d');
+      if (flyOn) flyLabel();
       if (dirBox.classList.contains('show') && !flyOn && (lastRoute || !dirTo.value)) updateDirections(tracking, true);
     }
 
@@ -1127,7 +1133,7 @@
       const dark = document.body.dataset.theme !== 'light';
       return { type: 'FeatureCollection', features: bld.map(b => {
         const col = (TYPE[b.type] || {}).color || '#818cf8', ring = b.pts.map(p => [p[1], p[0]]); ring.push(ring[0]);
-        return { type: 'Feature', properties: { wall: mixHex(col, dark ? '#aab4ff' : '#ffffff', 0.62), roof: b.roof || col, height: Math.max(1, b.floors || 1) * FLOOR_H },
+        return { type: 'Feature', properties: { wall: mixHex(col, dark ? '#aab4ff' : '#ffffff', 0.7), roof: b.roof || mixHex(col, dark ? '#aab4ff' : '#ffffff', 0.3), height: Math.max(1, b.floors || 1) * FLOOR_H },
                  geometry: { type: 'Polygon', coordinates: [ring] } };
       }) };
     }
@@ -1738,7 +1744,18 @@
       }
     }
     function updateHud(p) {
-      document.getElementById('flyFill').style.width = Math.round(p * 100) + '%';
+      const pc = (p * 100).toFixed(1) + '%';
+      document.getElementById('flyFill').style.width = pc;
+      document.getElementById('flyThumb').style.left = pc;
+    }
+    let flySpeed = 1;                           // 1x, 2x, 3x (tap the speed button)
+    const flyEase = t => 0.5 * t + 0.5 * (0.5 - 0.5 * Math.cos(Math.PI * t));   // gentle start and stop
+    function flyLabel(s) {                      // text in the bottom bar: distance and time left, or Arrived
+      const el = document.getElementById('flyTxt');
+      if (flyDone) { el.textContent = T('arrivedHud'); return; }
+      if (s === undefined) { el.textContent = T('fly3d'); return; }
+      const left = Math.max(0, flyData.total - s);
+      el.textContent = T('flyLeft', { m: Math.round(left / 5) * 5, t: Math.max(1, Math.ceil(left / 80)) });   // 80 m per minute walking
     }
 
     // ---------- helpers for the real-3D scene ----------
@@ -1774,10 +1791,10 @@
     function glBlocks() {
       return {
         type: 'FeatureCollection',
-        features: facilities.filter(f => !facilityCovered(f)).map(f => {
+        features: facilities.filter(f => !facilityCovered(f) && (GL_HEIGHT[f.type] || 14) >= 1).map(f => {   // flat places (parking, sports) get a pin only
           const dLat = GL_BLOCK_HALF / 111320, dLng = GL_BLOCK_HALF / (111320 * Math.cos(f.lat * Math.PI / 180));
           return {
-            type: 'Feature', properties: { color: TYPE[f.type].color, height: GL_HEIGHT[f.type] || 14 },
+            type: 'Feature', properties: { color: mixHex(TYPE[f.type].color, document.body.dataset.theme === 'light' ? '#ffffff' : '#8a93c8', 0.45), height: GL_HEIGHT[f.type] || 14 },
             geometry: { type: 'Polygon', coordinates: [[
               [f.lng - dLng, f.lat - dLat], [f.lng + dLng, f.lat - dLat], [f.lng + dLng, f.lat + dLat],
               [f.lng - dLng, f.lat + dLat], [f.lng - dLng, f.lat - dLat]
@@ -1823,22 +1840,28 @@
               'fill-extrusion-color': ['get', 'color'],
               'fill-extrusion-height': ['get', 'height'],
               'fill-extrusion-base': 0,
-              'fill-extrusion-opacity': 0.85
+              'fill-extrusion-opacity': 0.6
             } },
           { id: 'custom', type: 'fill-extrusion', source: 'custom',
-            paint: { 'fill-extrusion-color': ['get', 'wall'], 'fill-extrusion-height': ['get', 'height'], 'fill-extrusion-base': 0, 'fill-extrusion-opacity': 0.96 } },
+            paint: { 'fill-extrusion-color': ['get', 'wall'], 'fill-extrusion-height': ['get', 'height'], 'fill-extrusion-base': 0, 'fill-extrusion-opacity': 0.9 } },
           { id: 'custom-edge', type: 'line', source: 'custom', layout: { 'line-join': 'round' },
             paint: { 'line-color': ['get', 'roof'], 'line-width': 2.5, 'line-opacity': 0.9, 'line-blur': 0.5 } },
           { id: 'custom-roof', type: 'fill-extrusion', source: 'custom',
             paint: { 'fill-extrusion-color': ['get', 'roof'], 'fill-extrusion-base': ['get', 'height'], 'fill-extrusion-height': ['+', ['get', 'height'], 0.8], 'fill-extrusion-opacity': 1 } },
           { id: 'beam', type: 'fill-extrusion', source: 'beam',
             paint: { 'fill-extrusion-color': c2, 'fill-extrusion-base': 0, 'fill-extrusion-height': 70, 'fill-extrusion-opacity': 0.4 } },
+          { id: 'path-edge', type: 'line', source: 'path', layout: { 'line-cap': 'round', 'line-join': 'round' },
+            paint: { 'line-color': '#ffffff', 'line-width': 13, 'line-opacity': 0.95 } },
           { id: 'path', type: 'line', source: 'path', layout: { 'line-cap': 'round', 'line-join': 'round' },
-            paint: { 'line-color': c2, 'line-width': 6, 'line-opacity': 0.6 } },
+            paint: { 'line-color': c2, 'line-width': 8, 'line-opacity': 0.85 } },
           { id: 'trail-glow', type: 'line', source: 'trail', layout: { 'line-cap': 'round', 'line-join': 'round' },
-            paint: { 'line-color': c2, 'line-width': 16, 'line-opacity': 0.35, 'line-blur': 6 } },
+            paint: { 'line-color': c2, 'line-width': 20, 'line-opacity': 0.35, 'line-blur': 6 } },
           { id: 'trail-core', type: 'line', source: 'trail', layout: { 'line-cap': 'round', 'line-join': 'round' },
-            paint: { 'line-color': c2, 'line-width': 6, 'line-opacity': 1 } }
+            paint: { 'line-color': c2, 'line-width': 8, 'line-opacity': 1 } },
+          { id: 'arrows', type: 'symbol', source: 'path',
+            layout: { 'symbol-placement': 'line', 'symbol-spacing': 46, 'icon-image': 'routearrow', 'icon-size': 0.55,
+                      'icon-allow-overlap': true, 'icon-ignore-placement': true, 'icon-rotation-alignment': 'map', 'icon-pitch-alignment': 'map' },
+            paint: { 'icon-opacity': 0.95 } }
         ]
       };
     }
@@ -1885,6 +1908,15 @@
         attributionControl: { compact: true }
       });
       gl.on('error', e => console.warn('3D map:', e && e.error && e.error.message));
+      gl.on('styleimagemissing', e => {          // draw the little direction arrow used along the route
+        if (e.id !== 'routearrow') return;
+        const c = document.createElement('canvas'); c.width = c.height = 32;
+        const x = c.getContext('2d');
+        x.fillStyle = '#ffffff'; x.strokeStyle = 'rgba(0,0,0,.45)'; x.lineWidth = 2; x.lineJoin = 'round';
+        x.beginPath(); x.moveTo(9, 6); x.lineTo(25, 16); x.lineTo(9, 26); x.lineTo(14, 16); x.closePath();
+        x.stroke(); x.fill();
+        try { gl.addImage('routearrow', x.getImageData(0, 0, 32, 32)); } catch (err) {}
+      });
       glPins = facilities.map(f => ({ f, el: glPinEl(f, f.id === a || f.id === b), end: f.id === a || f.id === b }));
       glMarkers = glPins.map(o => new maplibregl.Marker({ element: o.el, anchor: 'center' })
         .setLngLat([o.f.lng, o.f.lat]).addTo(gl));
@@ -1896,7 +1928,7 @@
       const begin = () => {                      // tilt the camera in, then start walking
         if (started || !flyOn || flyMode !== 'gl') return;
         started = true; clearTimeout(glLoadTimer);
-        gl.easeTo({ pitch: 58, zoom: flyData.glZoom, bearing: glBear, duration: 1000,
+        gl.easeTo({ pitch: 54, zoom: flyData.glZoom, bearing: glBear, duration: 1000,
                     padding: { top: Math.round(window.innerHeight * 0.22), bottom: 0, left: 0, right: 0 } });
         flyTimer = setTimeout(() => { if (!flyOn) return; flyLast = performance.now(); flyRaf = requestAnimationFrame(flyFrame); }, 1100);
       };
@@ -1927,6 +1959,7 @@
       flyData = { pts, cum, total, idx: 0, dur: Math.min(40, Math.max(7, total / 45)) * 1000,
                   zoom: total < 450 ? 19 : 18, glZoom: total < 450 ? 19 : 18.5 };
       flyOn = true; flyPaused = false; flyDone = false; flyT = 0;
+      flySpeed = 1; document.getElementById('flySpeed').textContent = '1×';
       map.closePopup();
       const panel = document.getElementById('panel');
       panelWasHidden = panel.classList.contains('hidden');
@@ -1934,7 +1967,7 @@
       document.getElementById('flyHud').classList.add('show');
       document.body.classList.add('flying');
       document.getElementById('flyPause').textContent = '⏸';
-      document.getElementById('flyTxt').textContent = T('fly3d');
+      flyLabel();
       updateHud(0);
       clearTimeout(flyTimer);
       flyMode = glSupported() ? 'gl' : 'tilt';
@@ -1948,10 +1981,11 @@
     function flyFrame(now) {
       if (!flyOn) return;
       const dt = now - flyLast; flyLast = now;
-      if (!flyPaused && !flyDone) flyT = Math.min(1, flyT + dt / flyData.dur);
-      const p = 0.5 * flyT + 0.5 * (0.5 - 0.5 * Math.cos(Math.PI * flyT));   // gentle start and stop
+      if (!flyPaused && !flyDone) flyT = Math.min(1, flyT + dt * flySpeed / flyData.dur);
+      const p = flyEase(flyT);
       const s = p * flyData.total, pts = flyData.pts, cum = flyData.cum;
       let i = flyData.idx;
+      if (cum[i] > s) i = 0;                          // dragged backwards: search again from the start
       while (i < pts.length - 2 && cum[i + 1] < s) i++;
       flyData.idx = i;
       const segLen = (cum[i + 1] - cum[i]) || 1;
@@ -1982,10 +2016,11 @@
       }
 
       updateHud(flyT);
+      if (flyT < 1) flyLabel(s);
       if (flyT >= 1) {
         flyDone = true;
         document.getElementById('flyPause').textContent = '↻';
-        document.getElementById('flyTxt').textContent = T('arrivedHud');
+        flyLabel();
         if (flyMode !== 'gl') return;
       }
       flyRaf = requestAnimationFrame(flyFrame);
@@ -2005,7 +2040,7 @@
           map.setView(a, flyData.zoom, { animate: false });
           flyGlow.setLatLngs([a]); flyCore.setLatLngs([a]); flyWalker.setLatLng(a);
         }
-        document.getElementById('flyTxt').textContent = T('fly3d');
+        flyLabel(0);
         flyLast = performance.now();
         cancelAnimationFrame(flyRaf);
         flyRaf = requestAnimationFrame(flyFrame);
@@ -2036,6 +2071,32 @@
       }, 1000);
     }
     document.getElementById('flyPause').onclick = flyToggle;
+    document.getElementById('flySpeed').onclick = () => {
+      flySpeed = flySpeed === 1 ? 2 : (flySpeed === 2 ? 3 : 1);
+      document.getElementById('flySpeed').textContent = flySpeed + '×';
+    };
+    (function () {                              // drag the bar to jump to any point of the walk
+      const sc = document.getElementById('flyScrub');
+      let down = false;
+      function seek(e) {
+        if (!flyOn || !flyData) return;
+        const r = sc.getBoundingClientRect();
+        flyT = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
+        if (flyT < 1 && flyDone) {
+          flyDone = false;
+          document.getElementById('flyPause').textContent = flyPaused ? '▶' : '⏸';
+        }
+        const s = flyEase(flyT) * flyData.total;
+        if (flyMode === 'gl') { const h = headingAt(s); if (h !== null) glBear = h; }
+        flyLast = performance.now();
+        cancelAnimationFrame(flyRaf);
+        flyRaf = requestAnimationFrame(flyFrame);
+      }
+      sc.addEventListener('pointerdown', e => { down = true; try { sc.setPointerCapture(e.pointerId); } catch (x) {} seek(e); e.preventDefault(); });
+      sc.addEventListener('pointermove', e => { if (down) seek(e); });
+      const up = () => { down = false; };
+      sc.addEventListener('pointerup', up); sc.addEventListener('pointercancel', up);
+    })();
     document.getElementById('flyClose').onclick = () => stopFly();
     document.addEventListener('keydown', e => { if (e.key === 'Escape') stopFly(); });
 
