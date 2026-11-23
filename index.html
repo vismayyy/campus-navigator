@@ -366,7 +366,18 @@
     .ob.closed { color: #dc2626; background: rgba(239,68,68,.14);  border-color: rgba(239,68,68,.45); }
     .pop-open { margin: 2px 0 6px; }
     .card .ob { margin-left: 6px; vertical-align: 1px; }
-    #installBtn { display: none; }
+    #installBtn.hide { display: none; }
+    /* ---------- INSTALL HELP POPUP ---------- */
+    #installModal {
+      position: fixed; inset: 0; z-index: 3000; display: none; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.55); padding: 16px;
+    }
+    #installModal.show { display: flex; }
+    #installCard { width: min(360px, 100%); padding: 18px; background: var(--solid); max-height: 92vh; overflow-y: auto; }
+    #installCard h3 { margin: 0 0 8px; font-size: 16px; text-align: center; }
+    #installCard ol { margin: 0 0 14px; padding-left: 20px; font-size: 13px; line-height: 1.65; }
+    #installCard li { margin-bottom: 6px; }
+    #installCard .row { display: flex; justify-content: center; }
     @media (max-width: 700px) { #installBtn .inst-txt { display: none; } }
     .no-match { padding: 14px; text-align: center; color: var(--muted); font-size: 13px; }
     #langBtn { font-weight: 600; }
@@ -503,6 +514,15 @@
         <button class="btn" id="dlQrBtn" data-i18n="dlQr">Download QR</button>
         <button class="btn" id="shareClose" data-i18n="close">Close</button>
       </div>
+    </div>
+  </div>
+
+  <!-- INSTALL HELP POPUP -->
+  <div id="installModal">
+    <div id="installCard" class="glass">
+      <h3 id="installTitle"></h3>
+      <ol id="installSteps"></ol>
+      <div class="row"><button class="btn" id="installClose" data-i18n="close">Close</button></div>
     </div>
   </div>
 
@@ -669,6 +689,10 @@
         walkDist: "Walk {d}", uturn: "Make a U-turn", sharpR: "Take a sharp right", sharpL: "Take a sharp left",
         turnR: "Turn right", turnL: "Turn left", bearR: "Bear right", bearL: "Bear left",
         installTxt: " Install", installTip: "Install the app on your phone",
+        instTitle: "📲 Install the app",
+        instAndroid: "Open this link in Chrome (if you came from WhatsApp or Instagram, tap ⋮ and choose “Open in Chrome”)|Tap the ⋮ (three dots) at the top right|Tap “Install app” or “Add to Home screen”",
+        instIOS: "Open this link in Safari|Tap the Share icon (square with an arrow pointing up) at the bottom|Scroll down and tap “Add to Home Screen”, then tap “Add”",
+        instDesktop: "Click the install icon at the right end of the address bar, then click “Install”",
         openNow: "Open now", closingSoon: "Closing soon", closed: "Closed", closedToday: "Closed today",
         closesAt: "Closes at {t}", opensAt: "Opens at {t}",
         voiceOnSay: "Voice directions on", liveStartSay: "Live directions started",
@@ -717,6 +741,10 @@
         walkDist: "{d} ನಡೆಯಿರಿ", uturn: "ಯು-ಟರ್ನ್ ಮಾಡಿ", sharpR: "ತೀವ್ರವಾಗಿ ಬಲಕ್ಕೆ ತಿರುಗಿ", sharpL: "ತೀವ್ರವಾಗಿ ಎಡಕ್ಕೆ ತಿರುಗಿ",
         turnR: "ಬಲಕ್ಕೆ ತಿರುಗಿ", turnL: "ಎಡಕ್ಕೆ ತಿರುಗಿ", bearR: "ಸ್ವಲ್ಪ ಬಲಕ್ಕೆ ತಿರುಗಿ", bearL: "ಸ್ವಲ್ಪ ಎಡಕ್ಕೆ ತಿರುಗಿ",
         installTxt: " ಇನ್‌ಸ್ಟಾಲ್", installTip: "ಆ್ಯಪ್ ಅನ್ನು ನಿಮ್ಮ ಫೋನ್‌ನಲ್ಲಿ ಇನ್‌ಸ್ಟಾಲ್ ಮಾಡಿ",
+        instTitle: "📲 ಆ್ಯಪ್ ಇನ್‌ಸ್ಟಾಲ್ ಮಾಡಿ",
+        instAndroid: "ಈ ಲಿಂಕ್ ಅನ್ನು Chrome ನಲ್ಲಿ ತೆರೆಯಿರಿ (WhatsApp ಅಥವಾ Instagram ನಿಂದ ಬಂದಿದ್ದರೆ ⋮ ಒತ್ತಿ “Open in Chrome” ಆಯ್ಕೆಮಾಡಿ)|ಮೇಲಿನ ಬಲಭಾಗದ ⋮ (ಮೂರು ಚುಕ್ಕೆ) ಒತ್ತಿ|“Install app” ಅಥವಾ “Add to Home screen” ಒತ್ತಿ",
+        instIOS: "ಈ ಲಿಂಕ್ ಅನ್ನು Safari ನಲ್ಲಿ ತೆರೆಯಿರಿ|ಕೆಳಗಿನ Share ಐಕಾನ್ ಒತ್ತಿ (ಮೇಲ್ಮುಖ ಬಾಣವಿರುವ ಚೌಕ)|ಕೆಳಗೆ ಸ್ಕ್ರಾಲ್ ಮಾಡಿ “Add to Home Screen” ಒತ್ತಿ, ನಂತರ “Add” ಒತ್ತಿ",
+        instDesktop: "ವಿಳಾಸ ಪಟ್ಟಿಯ (address bar) ಬಲ ತುದಿಯಲ್ಲಿರುವ ಇನ್‌ಸ್ಟಾಲ್ ಐಕಾನ್ ಒತ್ತಿ, ನಂತರ “Install” ಒತ್ತಿ",
         openNow: "ಈಗ ತೆರೆದಿದೆ", closingSoon: "ಶೀಘ್ರದಲ್ಲೇ ಮುಚ್ಚುತ್ತದೆ", closed: "ಮುಚ್ಚಿದೆ", closedToday: "ಇಂದು ಮುಚ್ಚಿದೆ",
         closesAt: "{t} ಕ್ಕೆ ಮುಚ್ಚುತ್ತದೆ", opensAt: "{t} ಕ್ಕೆ ತೆರೆಯುತ್ತದೆ",
         voiceOnSay: "ಧ್ವನಿ ಮಾರ್ಗದರ್ಶನ ಆನ್ ಆಗಿದೆ", liveStartSay: "ಲೈವ್ ಮಾರ್ಗದರ್ಶನ ಆರಂಭವಾಗಿದೆ",
@@ -2276,22 +2304,35 @@
     openFromLink();
 
     // ================= INSTALLABLE APP (PWA) =================
-    // The browser offers "Install" when the app is opened from an https:// link (like your GitHub Pages link).
-    // The button below appears only when the browser says the app can be installed, and hides once it is installed.
+    // Android Chrome can install with one tap (the browser sends an "install event").
+    // iPhones, and links opened inside WhatsApp / Instagram, never send it - so for those the
+    // Install button shows simple step-by-step instructions instead. The button hides once installed.
     let installEvent = null;
     const installBtn = document.getElementById('installBtn');
+    const installModal = document.getElementById('installModal');
     const isStandalone = () => (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
-    window.addEventListener('beforeinstallprompt', e => {
-      e.preventDefault();
-      installEvent = e;
-      if (!isStandalone()) installBtn.style.display = 'inline-block';
-    });
+    const isIOS = () => /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    const isAndroid = () => /android/i.test(navigator.userAgent);
+    function hideInstall() { installBtn.classList.add('hide'); }
+    if (isStandalone()) hideInstall();
+    window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvent = e; });
+    function showInstallHelp() {
+      const key = isIOS() ? 'instIOS' : (isAndroid() ? 'instAndroid' : 'instDesktop');
+      document.getElementById('installTitle').textContent = T('instTitle');
+      document.getElementById('installSteps').innerHTML = T(key).split('|').map(x => '<li>' + x + '</li>').join('');
+      installModal.classList.add('show');
+    }
     installBtn.onclick = () => {
-      if (!installEvent) return;
-      installEvent.prompt();
-      installEvent.userChoice.then(() => { installEvent = null; installBtn.style.display = 'none'; }).catch(() => {});
+      if (installEvent) {
+        installEvent.prompt();
+        installEvent.userChoice.then(() => { installEvent = null; }).catch(() => {});
+      } else {
+        showInstallHelp();
+      }
     };
-    window.addEventListener('appinstalled', () => { installEvent = null; installBtn.style.display = 'none'; });
+    document.getElementById('installClose').onclick = () => installModal.classList.remove('show');
+    installModal.addEventListener('click', e => { if (e.target === installModal) installModal.classList.remove('show'); });
+    window.addEventListener('appinstalled', () => { installEvent = null; hideInstall(); installModal.classList.remove('show'); });
     if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
       window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
     }
