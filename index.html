@@ -296,6 +296,7 @@
 
 
     .gpin { transition: none; }
+    .fly-hide { display: none !important; }      /* hides other place icons during the 3D preview */
     /* ---------- REAL 3D SCENE (MapLibre) ---------- */
     #map3d { position: fixed; inset: 0; z-index: 900; display: none; background: var(--fog, #111); }
     #map3d.show { display: block; animation: glin .6s ease; }
@@ -1945,7 +1946,8 @@
         x.stroke(); x.fill();
         try { gl.addImage('routearrow', x.getImageData(0, 0, 32, 32)); } catch (err) {}
       });
-      glPins = facilities.map(f => ({ f, el: glPinEl(f, f.id === a || f.id === b), end: f.id === a || f.id === b }));
+      // only the START and END places get a pin in the 3D preview (no other icons)
+      glPins = facilities.filter(f => f.id === a || f.id === b).map(f => ({ f, el: glPinEl(f, true), end: true }));
       glMarkers = glPins.map(o => new maplibregl.Marker({ element: o.el, anchor: 'center' })
         .setLngLat([o.f.lng, o.f.lat]).addTo(gl));
       const wrap = document.createElement('div');
@@ -2003,7 +2005,16 @@
         try { startGL(); return; }
         catch (e) { console.warn('Real 3D failed, using the tilted view instead:', e); glTeardown(); flyMode = 'tilt'; }
       }
+      flyHideOtherPins([dirFrom.value === 'me' ? null : Number(dirFrom.value), Number(dirTo.value)]);
       startTilt();
+    }
+
+    // Fallback (tilted) view uses the normal map, so hide every place icon except the start and end ones
+    function flyHideOtherPins(keep) {
+      facilities.forEach(f => { const el = markers[f.id] && markers[f.id].getElement(); if (el) el.classList.toggle('fly-hide', !keep.includes(f.id)); });
+    }
+    function flyShowAllPins() {
+      facilities.forEach(f => { const el = markers[f.id] && markers[f.id].getElement(); if (el) el.classList.remove('fly-hide'); });
     }
 
     function flyFrame(now) {
@@ -2023,7 +2034,6 @@
       if (flyMode === 'gl') {
         if (!gl) return;
         glWalker.setLngLat(lngLat(pos));
-        if ((glFrameNo & 7) === 0) glUpdatePins(pos);                     // show only the pins close to the camera
         if ((glFrameNo++ & 1) === 0 || flyT >= 1) {                       // trail every 2nd frame is plenty
           const trail = pts.slice(0, i + 1).map(lngLat); trail.push(lngLat(pos));
           glSetTrail(trail);
@@ -2090,6 +2100,7 @@
         if (!panelWasHidden) document.getElementById('panel').classList.remove('hidden');
         return;
       }
+      flyShowAllPins();
       flyLayer.clearLayers();
       setTilt(false);
       setInteractions(true);
