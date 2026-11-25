@@ -434,6 +434,33 @@
       #coordbox { top: 62px; right: 10px; width: 240px; }
       .leaflet-control-zoom { display: none; }   /* phones use pinch-to-zoom; the buttons were hidden behind the panel */
     }
+
+    /* ---------- MASCOT: APPU ---------- */
+    #appu { position: fixed; z-index: 1400; right: 14px; bottom: calc(120px + env(safe-area-inset-bottom, 0px));
+            display: flex; flex-direction: column; align-items: flex-end; gap: 8px; pointer-events: none; }
+    #appu > * { pointer-events: auto; }
+    #appuBtn { width: 58px; height: 58px; padding: 0; border-radius: 50%; border: 2px solid var(--accent); background: var(--solid);
+               box-shadow: 0 6px 18px rgba(0,0,0,.35); cursor: pointer; display: grid; place-items: center;
+               animation: appuBob 3.2s ease-in-out infinite; }
+    #appuBtn svg { width: 46px; height: 46px; }
+    @keyframes appuBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+    #appuBubble { display: none; order: -1; position: relative; max-width: min(280px, calc(100vw - 96px)); padding: 12px 14px; font-size: 13px; line-height: 1.5; }
+    #appuBubble.show { display: block; animation: appuPop .25s ease; }
+    @keyframes appuPop { from { transform: scale(.92); opacity: 0; } to { transform: none; opacity: 1; } }
+    #appuMsg { padding-right: 16px; }
+    #appuX { position: absolute; top: 4px; right: 6px; background: none; border: 0; color: var(--muted); cursor: pointer; font-size: 14px; }
+    #appuBtns { display: none; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+    #appuBtns .btn { padding: 6px 10px; font-size: 12px; }
+    body.flying #appu { bottom: calc(86px + env(safe-area-inset-bottom, 0px)); }
+    @media (max-width: 700px) {
+      #appu { bottom: auto; top: 64px; right: 10px; }
+      #appuBubble { order: 1; }
+      body.flying #appu { top: 12px; bottom: auto; }
+      #appuBtn { width: 50px; height: 50px; }
+      #appuBtn svg { width: 40px; height: 40px; }
+      .tour-txt { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) { #appuBtn { animation: none; } }
   </style>
 </head>
 <body data-theme="dark">
@@ -474,6 +501,7 @@
     <button class="btn" id="themeBtn" title="Switch between dark and bright" data-i18n-title="themeTip"></button>
     <button class="btn" id="langBtn" title="Switch language" data-i18n-title="langTip"></button>
     <button class="btn" id="installBtn" title="Install the app on your phone" data-i18n-title="installTip">📲<span class="inst-txt" data-i18n="installTxt"> Install</span></button>
+    <button class="btn" id="tourBtn" title="Campus tour" data-i18n-title="tourTip">🎒<span class="tour-txt" data-i18n="tourTxt"> Tour</span></button>
     <div class="divider" id="toolDivider"></div>
     <button class="btn" id="toolBtn">📍 Path tool: OFF</button>
   </div>
@@ -525,6 +553,33 @@
       <ol id="installSteps"></ol>
       <div class="row"><button class="btn" id="installClose" data-i18n="close">Close</button></div>
     </div>
+  </div>
+
+  <!-- MASCOT: APPU, the campus guide -->
+  <div id="appu">
+    <div id="appuBubble" class="glass" role="status" aria-live="polite">
+      <button id="appuX" aria-label="Close">✕</button>
+      <div id="appuMsg"></div>
+      <div id="appuBtns">
+        <button class="btn" id="appuTour"></button>
+        <button class="btn" id="appuTip"></button>
+      </div>
+    </div>
+    <button id="appuBtn" type="button">
+      <svg viewBox="0 0 64 64" aria-hidden="true">
+        <defs><linearGradient id="appuG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7c5cff"/><stop offset="1" stop-color="#00c2ff"/></linearGradient></defs>
+        <path d="M14 20 L9 7 L25 14 Z" fill="#5b3fd9"/><path d="M50 20 L55 7 L39 14 Z" fill="#5b3fd9"/>
+        <ellipse cx="32" cy="37" rx="22" ry="23" fill="url(#appuG)"/>
+        <ellipse cx="32" cy="48" rx="13" ry="11" fill="#fff" opacity=".85"/>
+        <circle cx="23" cy="30" r="9" fill="#fff"/><circle cx="41" cy="30" r="9" fill="#fff"/>
+        <circle cx="24" cy="31" r="4.5" fill="#1b1f3a"/><circle cx="40" cy="31" r="4.5" fill="#1b1f3a"/>
+        <circle cx="25.6" cy="29.4" r="1.6" fill="#fff"/><circle cx="41.6" cy="29.4" r="1.6" fill="#fff"/>
+        <path d="M28 37 L36 37 L32 44 Z" fill="#ffb020"/>
+        <path d="M11 15 L32 7 L53 15 L32 23 Z" fill="#1b1f3a"/>
+        <path d="M22 19 L22 25 Q32 30 42 25 L42 19 L32 23 Z" fill="#2b3160"/>
+        <path d="M52 15 L52 25" stroke="#ffb020" stroke-width="2"/><circle cx="52" cy="26" r="2.2" fill="#ffb020"/>
+      </svg>
+    </button>
   </div>
 
   <script>
@@ -690,6 +745,14 @@
         walkDist: "Walk {d}", uturn: "Make a U-turn", sharpR: "Take a sharp right", sharpL: "Take a sharp left",
         turnR: "Turn right", turnL: "Turn left", bearR: "Bear right", bearL: "Bear left",
         installTxt: " Install", installTip: "Install the app on your phone",
+        tourTxt: " Tour", tourTip: "Take a campus tour with Appu",
+        tourHud: "🎒 Stop {i}/{n} · {name}", tourDone: "🎒 Tour complete", tourNoRoute: "Sorry, the tour route is not ready yet.",
+        tourStart: "Let’s go! We start at {name}.",
+        tourStop: "Stop {i} of {n}: {name}. {info}.",
+        tourEnd: "That’s the tour! Tap any place on the map, or ask me for a tip anytime.",
+        appuTitle: "Appu, your campus guide", appuTourBtn: "🎒 Campus tour", appuTipBtn: "💡 Tip",
+        appuHi: "Hi! I’m Appu 🦉, your campus guide. Want a quick tour of the campus?",
+        appuTips: "Type a few letters in the search bar, like “lib”, and I’ll jump to the Library!|Tap the Nearest to me buttons to find the closest places around you.|Pick two places in Directions and tap the 3D preview to watch the walk before you go.|Use the chips (Hostel, Food, Academic…) to show only one kind of place on the map.|Tap Share to get a QR code for any place or route. Great for friends and parents!|You can switch between English and ಕನ್ನಡ with the language button at the top.|Tap Install to keep this app on your phone like a normal app.",
         instTitle: "📲 Install the app",
         instAndroid: "Open this link in Chrome (if you came from WhatsApp or Instagram, tap ⋮ and choose “Open in Chrome”)|Tap the ⋮ (three dots) at the top right|Tap “Install app” or “Add to Home screen”",
         instIOS: "Open this link in Safari|Tap the Share icon (square with an arrow pointing up) at the bottom|Scroll down and tap “Add to Home Screen”, then tap “Add”",
@@ -742,6 +805,14 @@
         walkDist: "{d} ನಡೆಯಿರಿ", uturn: "ಯು-ಟರ್ನ್ ಮಾಡಿ", sharpR: "ತೀವ್ರವಾಗಿ ಬಲಕ್ಕೆ ತಿರುಗಿ", sharpL: "ತೀವ್ರವಾಗಿ ಎಡಕ್ಕೆ ತಿರುಗಿ",
         turnR: "ಬಲಕ್ಕೆ ತಿರುಗಿ", turnL: "ಎಡಕ್ಕೆ ತಿರುಗಿ", bearR: "ಸ್ವಲ್ಪ ಬಲಕ್ಕೆ ತಿರುಗಿ", bearL: "ಸ್ವಲ್ಪ ಎಡಕ್ಕೆ ತಿರುಗಿ",
         installTxt: " ಇನ್‌ಸ್ಟಾಲ್", installTip: "ಆ್ಯಪ್ ಅನ್ನು ನಿಮ್ಮ ಫೋನ್‌ನಲ್ಲಿ ಇನ್‌ಸ್ಟಾಲ್ ಮಾಡಿ",
+        tourTxt: " ಟೂರ್", tourTip: "ಅಪ್ಪು ಜೊತೆ ಕ್ಯಾಂಪಸ್ ಟೂರ್ ಮಾಡಿ",
+        tourHud: "🎒 ನಿಲ್ದಾಣ {i}/{n} · {name}", tourDone: "🎒 ಟೂರ್ ಮುಗಿಯಿತು", tourNoRoute: "ಕ್ಷಮಿಸಿ, ಟೂರ್ ದಾರಿ ಇನ್ನೂ ಸಿದ್ಧವಾಗಿಲ್ಲ.",
+        tourStart: "ಹೊರಡೋಣ! {name} ಇಂದ ಶುರು ಮಾಡೋಣ.",
+        tourStop: "ನಿಲ್ದಾಣ {i}/{n}: {name}. {info}.",
+        tourEnd: "ಟೂರ್ ಮುಗಿಯಿತು! ಮ್ಯಾಪ್‌ನಲ್ಲಿ ಯಾವುದೇ ಸ್ಥಳ ಒತ್ತಿ, ಇಲ್ಲವೇ ನನ್ನಲ್ಲಿ ಸಲಹೆ ಕೇಳಿ.",
+        appuTitle: "ಅಪ್ಪು, ನಿಮ್ಮ ಕ್ಯಾಂಪಸ್ ಗೈಡ್", appuTourBtn: "🎒 ಕ್ಯಾಂಪಸ್ ಟೂರ್", appuTipBtn: "💡 ಸಲಹೆ",
+        appuHi: "ನಮಸ್ಕಾರ! ನಾನು ಅಪ್ಪು 🦉, ನಿಮ್ಮ ಕ್ಯಾಂಪಸ್ ಗೈಡ್. ಕ್ಯಾಂಪಸ್ ಟೂರ್ ಮಾಡೋಣವೇ?",
+        appuTips: "ಸರ್ಚ್ ಬಾರ್‌ನಲ್ಲಿ “lib” ಎಂದು ಟೈಪ್ ಮಾಡಿ, ನಾನು ಗ್ರಂಥಾಲಯಕ್ಕೆ ಕರೆದುಕೊಂಡು ಹೋಗುತ್ತೇನೆ!|ನಿಮ್ಮ ಹತ್ತಿರದ ಸ್ಥಳಗಳನ್ನು ಹುಡುಕಲು “ಹತ್ತಿರದ” ಬಟನ್‌ಗಳನ್ನು ಒತ್ತಿ.|ಮಾರ್ಗದರ್ಶನದಲ್ಲಿ ಎರಡು ಸ್ಥಳ ಆಯ್ಕೆ ಮಾಡಿ, 3D ಪೂರ್ವವೀಕ್ಷಣೆ ಒತ್ತಿ. ಹೋಗುವ ಮೊದಲೇ ದಾರಿ ನೋಡಿ!|ಚಿಪ್‌ಗಳನ್ನು (ಹಾಸ್ಟೆಲ್, ಆಹಾರ, ಶೈಕ್ಷಣಿಕ…) ಒತ್ತಿ, ಒಂದೇ ರೀತಿಯ ಸ್ಥಳಗಳನ್ನು ಮಾತ್ರ ನೋಡಿ.|ಹಂಚಿಕೊಳ್ಳಿ ಒತ್ತಿದರೆ ಯಾವುದೇ ಸ್ಥಳ ಅಥವಾ ದಾರಿಯ QR ಕೋಡ್ ಸಿಗುತ್ತದೆ. ಸ್ನೇಹಿತರಿಗೆ, ಪೋಷಕರಿಗೆ ಕಳುಹಿಸಿ!|ಮೇಲಿನ ಭಾಷಾ ಬಟನ್‌ನಿಂದ English ಮತ್ತು ಕನ್ನಡ ಬದಲಿಸಬಹುದು.|ಇನ್‌ಸ್ಟಾಲ್ ಒತ್ತಿ, ಈ ಆ್ಯಪ್ ನಿಮ್ಮ ಫೋನ್‌ನಲ್ಲಿ ಸಾಮಾನ್ಯ ಆ್ಯಪ್‌ನಂತೆ ಇರುತ್ತದೆ.",
         instTitle: "📲 ಆ್ಯಪ್ ಇನ್‌ಸ್ಟಾಲ್ ಮಾಡಿ",
         instAndroid: "ಈ ಲಿಂಕ್ ಅನ್ನು Chrome ನಲ್ಲಿ ತೆರೆಯಿರಿ (WhatsApp ಅಥವಾ Instagram ನಿಂದ ಬಂದಿದ್ದರೆ ⋮ ಒತ್ತಿ “Open in Chrome” ಆಯ್ಕೆಮಾಡಿ)|ಮೇಲಿನ ಬಲಭಾಗದ ⋮ (ಮೂರು ಚುಕ್ಕೆ) ಒತ್ತಿ|“Install app” ಅಥವಾ “Add to Home screen” ಒತ್ತಿ",
         instIOS: "ಈ ಲಿಂಕ್ ಅನ್ನು Safari ನಲ್ಲಿ ತೆರೆಯಿರಿ|ಕೆಳಗಿನ Share ಐಕಾನ್ ಒತ್ತಿ (ಮೇಲ್ಮುಖ ಬಾಣವಿರುವ ಚೌಕ)|ಕೆಳಗೆ ಸ್ಕ್ರಾಲ್ ಮಾಡಿ “Add to Home Screen” ಒತ್ತಿ, ನಂತರ “Add” ಒತ್ತಿ",
@@ -857,6 +928,7 @@
       });
       if (meDot) meDot.setTooltipContent(T('youAreHere'));
       updateFollowBtn();
+      if (typeof appuRefresh === 'function') appuRefresh();
       lastVoiceKey = '';
       if (flyOn) flyLabel();
       if (dirBox.classList.contains('show') && !flyOn && (lastRoute || !dirTo.value)) updateDirections(tracking, true);
@@ -1014,7 +1086,8 @@
       const text = searchBox.value.toLowerCase().trim();
       const hits = [];
       facilities.forEach(f => {
-        if (activeType !== 'All' && f.type !== activeType) return;
+        if (activeType === '__open') { const os = openStatus(f); if (!os || os.cls === 'closed') return; }
+        else if (activeType !== 'All' && f.type !== activeType) return;
         const sc = matchScore(f, text);
         if (sc >= 0) hits.push({ f, sc });
       });
@@ -1051,18 +1124,30 @@
       declutter();
     }
 
+    function fitChipResults() {                  // zoom the map to the places the chip kept (clear of the side panel)
+      const pts = facilities.filter(f => map.hasLayer(markers[f.id])).map(f => [f.lat, f.lng]);
+      if (!pts.length) return;
+      const mob = window.innerWidth <= 700;
+      map.fitBounds(pts, {
+        paddingTopLeft: mob ? [30, 70] : [360, 70],
+        paddingBottomRight: mob ? [30, Math.round(window.innerHeight * 0.5) + 20] : [40, 40],
+        maxZoom: 18
+      });
+    }
+
     function buildChips() {
       chipsDiv.innerHTML = '';
-      const types = ['All', ...new Set(facilities.map(f => f.type))];
+      const types = ['All', '__open', ...new Set(facilities.map(f => f.type))];
       types.forEach(ty => {
         const b = document.createElement('button');
         b.className = 'chip' + (ty === activeType ? ' active' : '');
-        b.textContent = (ty === 'All' ? '✨ ' + T('all') : TYPE[ty].emoji + ' ' + ptype(ty));
+        b.textContent = (ty === 'All' ? '✨ ' + T('all') : ty === '__open' ? '🟢 ' + T('openNow') : TYPE[ty].emoji + ' ' + ptype(ty));
         b.onclick = () => {
           activeType = ty;
           chipsDiv.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
           b.classList.add('active');
           applyFilter();
+          fitChipResults();
         };
         chipsDiv.appendChild(b);
       });
@@ -1743,6 +1828,7 @@
     let flyTimer = 0, tiltTimer = 0, panelWasHidden = false, flyWalker = null, flyGlow = null, flyCore = null;
     let flyMode = 'tilt';                       // 'gl' = real 3D, 'tilt' = fallback
     let gl = null, glWalker = null, glMarkers = [], glPins = [], glBear = 0, glLoadTimer = 0, glFrameNo = 0;
+    let tourData = null, tourHold = 0;           // campus tour: the stops and a short pause at each one
 
     // Height (metres) of the coloured landmark block drawn at each place. These blocks make sure every
     // place is visible in 3D even where OpenStreetMap has no building drawn. Change the numbers freely.
@@ -1781,6 +1867,10 @@
     const flyEase = t => 0.5 * t + 0.5 * (0.5 - 0.5 * Math.cos(Math.PI * t));   // gentle start and stop
     function flyLabel(s) {                      // text in the bottom bar: distance and time left, or Arrived
       const el = document.getElementById('flyTxt');
+      if (tourData) {
+        el.textContent = flyDone ? T('tourDone') : T('tourHud', { i: tourData.at + 1, n: tourData.stops.length, name: pname(tourData.stops[tourData.at].f) });
+        return;
+      }
       if (flyDone) { el.textContent = T('arrivedHud'); return; }
       if (s === undefined) { el.textContent = T('fly3d'); return; }
       const left = Math.max(0, flyData.total - s);
@@ -1964,7 +2054,8 @@
         try { gl.addImage('routearrow', x.getImageData(0, 0, 32, 32)); } catch (err) {}
       });
       // only the START and END places get a pin in the 3D preview (no other icons)
-      glPins = facilities.filter(f => f.id === a || f.id === b).map(f => ({ f, el: glPinEl(f, true), end: true }));
+      const keepIds = tourData ? tourData.stops.map(x => x.f.id) : [a, b];
+      glPins = facilities.filter(f => keepIds.includes(f.id)).map(f => ({ f, el: glPinEl(f, true), end: true }));
       glMarkers = glPins.map(o => new maplibregl.Marker({ element: o.el, anchor: 'center' })
         .setLngLat([o.f.lng, o.f.lat]).addTo(gl));
       const wrap = document.createElement('div');
@@ -1996,15 +2087,22 @@
       flyTimer = setTimeout(() => { if (!flyOn) return; flyLast = performance.now(); flyRaf = requestAnimationFrame(flyFrame); }, 1100);   // after the tilt-in
     }
 
-    function startFly() {
-      if (!lastRoute || flyOn) return;
-      const pts = pts_of(lastRoute);
+    function startFly(tourArg) {
+      const tour = (tourArg && tourArg.stops) ? tourArg : null;      // startFly() from a button passes no tour
+      if ((!lastRoute && !tour) || flyOn) return;
+      const pts = tour ? tour.pts : pts_of(lastRoute);
       const cum = [0];
       for (let i = 1; i < pts.length; i++) cum.push(cum[i - 1] + hav(pts[i - 1], pts[i]));
       const total = cum[cum.length - 1];
       if (pts.length < 2 || total < 5) return;
-      flyData = { pts, cum, total, idx: 0, dur: Math.min(40, Math.max(7, total / 45)) * 1000,
+      flyData = { pts, cum, total, idx: 0, dur: (tour ? Math.min(75, Math.max(25, total / 28)) : Math.min(40, Math.max(7, total / 45))) * 1000,
                   zoom: total < 450 ? 19 : 18, glZoom: total < 450 ? 19 : 18.5 };
+      tourData = tour;
+      if (tourData) {
+        tourData.stops.forEach(st => { st.s = cum[st.idx]; });
+        tourData.next = 1; tourData.at = 0;
+        tourHold = performance.now() + 4300;      // stay at the first stop for a moment, then start walking
+      }
       flyOn = true; flyPaused = false; flyDone = false; flyT = 0;
       flySpeed = 1; document.getElementById('flySpeed').textContent = '1×';
       map.closePopup();
@@ -2016,13 +2114,14 @@
       document.getElementById('flyPause').textContent = '⏸';
       flyLabel();
       updateHud(0);
+      if (tourData) tourAnnounce(0);
       clearTimeout(flyTimer);
       flyMode = glSupported() ? 'gl' : 'tilt';
       if (flyMode === 'gl') {
         try { startGL(); return; }
         catch (e) { console.warn('Real 3D failed, using the tilted view instead:', e); glTeardown(); flyMode = 'tilt'; }
       }
-      flyHideOtherPins([dirFrom.value === 'me' ? null : Number(dirFrom.value), Number(dirTo.value)]);
+      flyHideOtherPins(tourData ? tourData.stops.map(x => x.f.id) : [dirFrom.value === 'me' ? null : Number(dirFrom.value), Number(dirTo.value)]);
       startTilt();
     }
 
@@ -2037,7 +2136,8 @@
     function flyFrame(now) {
       if (!flyOn) return;
       const dt = now - flyLast; flyLast = now;
-      if (!flyPaused && !flyDone) flyT = Math.min(1, flyT + dt * flySpeed / flyData.dur);
+      const holding = tourData && now < tourHold;                    // standing at a tour stop
+      if (!flyPaused && !flyDone && !holding) flyT = Math.min(1, flyT + dt * flySpeed / flyData.dur);
       const p = flyEase(flyT);
       const s = p * flyData.total, pts = flyData.pts, cum = flyData.cum;
       let i = flyData.idx;
@@ -2070,6 +2170,7 @@
         map.panBy(off, { animate: false });
       }
 
+      if (tourData) tourCheck(s, now);
       updateHud(flyT);
       if (flyT < 1) flyLabel(s);
       if (flyT >= 1) {
@@ -2095,6 +2196,7 @@
           map.setView(a, flyData.zoom, { animate: false });
           flyGlow.setLatLngs([a]); flyCore.setLatLngs([a]); flyWalker.setLatLng(a);
         }
+        if (tourData) { tourData.next = 1; tourData.at = 0; tourHold = performance.now() + 2500; tourAnnounce(0); }
         flyLabel(0);
         flyLast = performance.now();
         cancelAnimationFrame(flyRaf);
@@ -2109,6 +2211,7 @@
     function stopFly() {
       if (!flyOn) return;
       flyOn = false;
+      if (tourData) { tourData = null; tourHold = 0; appuSay(''); }
       cancelAnimationFrame(flyRaf); clearTimeout(flyTimer);
       document.getElementById('flyHud').classList.remove('show');
       document.body.classList.remove('flying');
@@ -2126,6 +2229,95 @@
         if (!flyOn && lastRoute) map.fitBounds(L.latLngBounds(pts_of(lastRoute)), { padding: [70, 70], maxZoom: 19 });
       }, 1000);
     }
+    // ================= CAMPUS TOUR =================
+    // The stops, in order (place numbers). Change this list to change the tour.
+    const TOUR_STOPS = [1, 7, 10, 11, 15, 4, 8];   // Main Gate, Admin Block, Library, Canteen, Temple, College of Engineering, Placement Center
+
+    function buildTour() {
+      const stops = [], pts = [];
+      let prevId = null;
+      TOUR_STOPS.forEach(id => {
+        const f = facilities.find(x => x.id === id);
+        if (!f) return;
+        if (prevId === null) { pts.push([f.lat, f.lng]); stops.push({ f, idx: 0 }); prevId = id; return; }
+        const r = shortestPath(prevId, id);
+        if (!r) return;                                   // no walkable path to this place: skip it
+        pts_of(r).forEach((pt, k) => { if (k > 0) pts.push(pt); });
+        stops.push({ f, idx: pts.length - 1 });
+        prevId = id;
+      });
+      return stops.length >= 2 ? { pts, stops, next: 1, at: 0 } : null;
+    }
+    function startTour() {
+      if (flyOn) return;
+      const t = buildTour();
+      if (!t) { appuSay(T('tourNoRoute'), { ms: 6000 }); return; }
+      startFly(t);
+    }
+    function tourAnnounce(i) {                            // Appu tells you about the stop you just reached
+      if (!tourData) return;
+      const st = tourData.stops, n = st.length, f = st[i].f;
+      let text;
+      if (i === 0) text = T('tourStart', { name: pname(f) });
+      else {
+        text = T('tourStop', { i: i + 1, n, name: pname(f), info: pinfo(f) });
+        if (i === n - 1) text += ' ' + T('tourEnd');
+      }
+      appuSay(text);
+    }
+    function tourCheck(s, now) {                          // called every frame while a tour plays
+      const st = tourData.stops;
+      while (tourData.next > 1 && st[tourData.next - 1].s > s + 8) tourData.next--;       // bar dragged backwards
+      tourData.at = Math.max(0, tourData.next - 1);
+      let hit = -1;
+      while (st[tourData.next] && s >= st[tourData.next].s - 2) { hit = tourData.next; tourData.next++; }
+      if (hit >= 0) {
+        tourData.at = hit;
+        tourHold = now + 3200;                            // stand still for a moment at each stop
+        tourAnnounce(hit);
+      }
+    }
+    document.getElementById('tourBtn').onclick = startTour;
+
+    // ================= MASCOT: APPU =================
+    const appuBubble = document.getElementById('appuBubble');
+    const appuMsg = document.getElementById('appuMsg');
+    const appuBtns = document.getElementById('appuBtns');
+    let appuTipNo = -1, appuTimer = 0;
+    function appuSay(text, opts) {
+      opts = opts || {};
+      clearTimeout(appuTimer);
+      if (!text) { appuBubble.classList.remove('show'); return; }
+      appuMsg.textContent = text;
+      appuBtns.style.display = opts.buttons ? 'flex' : 'none';
+      appuBubble.classList.add('show');
+      if (opts.ms) appuTimer = setTimeout(() => appuBubble.classList.remove('show'), opts.ms);
+    }
+    function appuTip() {
+      const tips = T('appuTips').split('|');
+      appuTipNo = (appuTipNo + 1) % tips.length;
+      appuSay(tips[appuTipNo], { buttons: true });
+    }
+    function appuRefresh() {                              // language changed
+      const b = document.getElementById('appuBtn');
+      b.title = T('appuTitle'); b.setAttribute('aria-label', T('appuTitle'));
+      document.getElementById('appuTour').textContent = T('appuTourBtn');
+      document.getElementById('appuTip').textContent = T('appuTipBtn');
+    }
+    document.getElementById('appuBtn').onclick = () => {
+      if (flyOn) { appuBubble.classList.toggle('show'); return; }       // during a tour: just show or hide what Appu said
+      if (appuBubble.classList.contains('show')) appuSay(''); else appuTip();
+    };
+    document.getElementById('appuX').onclick = () => appuSay('');
+    document.getElementById('appuTour').onclick = () => { appuSay(''); startTour(); };
+    document.getElementById('appuTip').onclick = appuTip;
+    appuRefresh();
+    setTimeout(() => {                                    // say hello once per visit (not when a shared link opens a place)
+      let seen = false;
+      try { seen = sessionStorage.getItem('appuHi') === '1'; sessionStorage.setItem('appuHi', '1'); } catch (e) {}
+      if (!seen && !flyOn && !location.search) appuSay(T('appuHi'), { buttons: true, ms: 14000 });
+    }, 2500);
+
     document.getElementById('flyPause').onclick = flyToggle;
     document.getElementById('flySpeed').onclick = () => {
       flySpeed = flySpeed === 1 ? 2 : (flySpeed === 2 ? 3 : 1);
